@@ -19,6 +19,7 @@ namespace CluedIn.Crawling.DropBox.Core
         public const string CrawlerDescription = "DropBox is a web and mobile application designed to enable sharing and storage of files.";
         public const string CrawlerDisplayName = "DropBox";
         public const string Uri = "https://www.dropbox.com/home ";
+        public const string ApiUri = "https://api.dropboxapi.com/2";
 
 
         public const string ClientID = "123456";
