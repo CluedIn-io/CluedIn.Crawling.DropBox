@@ -42,20 +42,20 @@ Load [Crawling.DropBox.sln](.\Crawling.DropBox.sln) in Visual Studio or your pre
 
 ### Running Tests
 
-A mocked environment is required to run `integration` and `acceptance` tests. The mocked environment can be built and run using the following [Docker](https://www.docker.com/) command:
+To run all `Unit` and `Integration` tests use the following command:
 
 ```Shell
-docker-compose up --build -d
+dotnet test
 ```
 
-Use the following commands to run all `Unit` and `Integration` tests within the repository:
+`Unit` and `Integration` tests can be run independently as shown below:
 
 ```Shell
-dotnet test .\Crawling.DropBox.sln --filter Unit
-dotnet test .\Crawling.DropBox.sln --filter Integration
+dotnet test --filter Unit
+dotnet test --filter Integration
 ```
 
-To run [Pester](https://github.com/pester/Pester) `acceptance` tests
+To run [Pester](https://github.com/pester/Pester) `acceptance` tests:
 
 ```PowerShell
 invoke-pester
