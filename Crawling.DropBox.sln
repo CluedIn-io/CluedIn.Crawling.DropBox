@@ -14,11 +14,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crawling.DropBox.Unit.Test"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Provider.DropBox.Unit.Test", "test\unit\Provider.DropBox.Unit.Test\Provider.DropBox.Unit.Test.csproj", "{24C48AD5-562B-4C9B-9FC3-52EB0C79007C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{153182F5-8A66-4AF5-AEE5-A35ACF793692}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{57E743C9-2E9B-4CA7-A9BD-E89B46B390E9}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
@@ -42,6 +37,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{CBD22F04-6415-467D-B079-44D5B01965D1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crawling.DropBox.Integration.Test", "test\integration\Crawling.DropBox.Integration.Test\Crawling.DropBox.Integration.Test.csproj", "{8F3EF0B2-A6CA-4426-919D-5E0B26F8366B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{153182F5-8A66-4AF5-AEE5-A35ACF793692}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{52536837-D0BC-43EC-975F-8705CA6F0C3D}"
 	ProjectSection(SolutionItems) = preProject
