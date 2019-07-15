@@ -32,6 +32,7 @@ pool:
   vmImage: 'VS2017-Win2016'
   
 variables:
+  BuildConfiguration: 'Release'
   Dotnet.Skip.First.Time.Experience: 'True'
   testFolderPath: '$(Build.SourcesDirectory)/test'
 
