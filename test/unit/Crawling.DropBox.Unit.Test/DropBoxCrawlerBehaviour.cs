@@ -1,7 +1,9 @@
+using CluedIn.Core.Agent.Jobs;
 using CluedIn.Core.Crawling;
 using CluedIn.Core.Logging;
 using CluedIn.Crawling;
 using CluedIn.Crawling.DropBox;
+using CluedIn.Crawling.DropBox.Core;
 using CluedIn.Crawling.DropBox.Infrastructure.Factories;
 using Moq;
 using Should;
@@ -17,8 +19,9 @@ namespace Crawling.DropBox.Unit.Test
     {
         var nameClientFactory = new Mock<IDropBoxClientFactory>();
         var log = new Mock<ILogger>();
+        var state = new Mock<AgentJobProcessorState<DropBoxCrawlJobData>>();
 
-        _sut = new DropBoxCrawler(nameClientFactory.Object, log.Object);
+        _sut = new DropBoxCrawler(nameClientFactory.Object, log.Object, state.Object);
     }
 
     [Fact]
