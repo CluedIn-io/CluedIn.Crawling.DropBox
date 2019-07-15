@@ -23,17 +23,16 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
         private readonly DropboxClient _dropBoxClient;
         private readonly ILogger _log;
 
-        public DropBoxClient(ILogger log, DropBoxCrawlJobData crawlJobData, IRestClient restClient) 
+        public DropBoxClient(ILogger log, DropBoxCrawlJobData dropBoxCrawlJobData, IRestClient restClient) 
         {
             _log = log ?? throw new ArgumentNullException(nameof(log));
             _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-            //_dropBoxClient = dropBoxClient ?? throw new ArgumentNullException(nameof(dropBoxClient));
 
-            restClient.BaseUrl = new Uri(crawlJobData.BaseUri);
-            restClient.AddDefaultParameter("api_key", crawlJobData.ApiKey, ParameterType.QueryString);
-            restClient.AddDefaultHeader("Authorization", "Bearer " + crawlJobData.Token.AccessToken);
+            _restClient.BaseUrl = string.IsNullOrEmpty(dropBoxCrawlJobData.BaseUri) ? new Uri(DropBoxConstants.ApiUri) : new Uri(dropBoxCrawlJobData.BaseUri);
+            _restClient.AddDefaultParameter("api_key", dropBoxCrawlJobData.ApiKey, ParameterType.QueryString);
+            _restClient.AddDefaultHeader("Authorization", "Bearer " + dropBoxCrawlJobData.Token.AccessToken);
 
-            _dropBoxClient = new DropboxClient(crawlJobData.Token.AccessToken);
+            _dropBoxClient = new DropboxClient(dropBoxCrawlJobData.Token.AccessToken); // TODO figure out to DI this
         }
 
 

@@ -10,12 +10,6 @@ namespace CluedIn.Crawling.DropBox.Core
 {
     public class DropBoxCrawlJobData : CrawlJobData
     {
-        private readonly IDictionary<string, object> _configuration;
-
-        //public DropBoxCrawlJobData()
-        //{
-        //}
-
         public DropBoxCrawlJobData(IDictionary<string, object> configuration)
         {
             if (configuration == null)
@@ -91,9 +85,7 @@ namespace CluedIn.Crawling.DropBox.Core
                         : CrawlPriority.Normal
                 }));
             };
-
-            _configuration = configuration;
-
+            
             FileSizeLimit = Constants.MaxFileIndexingFileSize;
 
             configuration.TryGetValue("Accounts", out var accounts);
