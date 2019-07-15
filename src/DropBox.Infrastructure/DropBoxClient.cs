@@ -22,18 +22,14 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
         private readonly IRestClient _restClient;
         private readonly DropboxClient _dropBoxClient;
         private readonly ILogger _log;
-        private readonly DropBoxCrawlJobData _crawlJobData;
-        private readonly AgentJobProcessorState<DropBoxCrawlJobData> _state;
 
-        public DropBoxClient(ILogger log, DropBoxCrawlJobData crawlJobData, IRestClient restClient, DropboxClient dropBoxClient, AgentJobProcessorState<DropBoxCrawlJobData> state) 
+        public DropBoxClient(ILogger log, DropBoxCrawlJobData crawlJobData, IRestClient restClient) 
         {
             _log = log ?? throw new ArgumentNullException(nameof(log));
-            _crawlJobData = crawlJobData ?? throw new ArgumentNullException(nameof(crawlJobData));
             _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-            _dropBoxClient = dropBoxClient ?? throw new ArgumentNullException(nameof(dropBoxClient));
-            _state = state ?? throw new ArgumentNullException(nameof(state));
+            //_dropBoxClient = dropBoxClient ?? throw new ArgumentNullException(nameof(dropBoxClient));
 
-            restClient.BaseUrl = new Uri(DropBoxConstants.ApiUri);
+            restClient.BaseUrl = new Uri(crawlJobData.BaseUri);
             restClient.AddDefaultParameter("api_key", crawlJobData.ApiKey, ParameterType.QueryString);
             restClient.AddDefaultHeader("Authorization", "Bearer " + crawlJobData.Token.AccessToken);
 
@@ -133,8 +129,8 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
         {
             do
             {
-                if (_state.CancellationTokenSource.IsCancellationRequested)
-                    throw new OperationCanceledException();
+                //if (_state.CancellationTokenSource.IsCancellationRequested) // TODO Find out how to access state
+                //    throw new OperationCanceledException();
 
                 try
                 {
@@ -145,13 +141,13 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
                     var flat = ex.Flatten();
 
                     if (flat.InnerExceptions.Count == 1 && flat.InnerExceptions[0] is RateLimitException rateEx)
-                        await Task.Delay(TimeSpan.FromSeconds(rateEx.RetryAfter), _state.CancellationTokenSource.Token).ConfigureAwait(false);
+                        await Task.Delay(TimeSpan.FromSeconds(rateEx.RetryAfter)); //, _state.CancellationTokenSource.Token).ConfigureAwait(false);  // TODO Find out how to access state
                     else
                         throw;
                 }
                 catch (RateLimitException ex)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(ex.RetryAfter), _state.CancellationTokenSource.Token).ConfigureAwait(false);
+                    await Task.Delay(TimeSpan.FromSeconds(ex.RetryAfter)); //, _state.CancellationTokenSource.Token).ConfigureAwait(false);  // TODO Find out how to access state
                 }
             }
             while (true);

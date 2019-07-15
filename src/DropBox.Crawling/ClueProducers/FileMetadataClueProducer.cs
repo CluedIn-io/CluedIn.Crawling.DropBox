@@ -12,6 +12,7 @@ using CluedIn.Core.Logging;
 using CluedIn.Crawling.DropBox.Core;
 using CluedIn.Crawling.DropBox.Factories;
 using CluedIn.Crawling.DropBox.Infrastructure;
+using CluedIn.Crawling.DropBox.Infrastructure.Factories;
 using CluedIn.Crawling.DropBox.Infrastructure.Indexing;
 using CluedIn.Crawling.DropBox.Infrastructure.UriBuilders;
 using CluedIn.Crawling.DropBox.Vocabularies;
@@ -32,17 +33,21 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
         private readonly Clue _providerRoot;
         private readonly char[] _trimChars = { '/' };
 
-        public FileMetadataClueProducer([NotNull] IClueFactory factory, ILogger log, BoxFileUriBuilder uriBuilder, AgentJobProcessorState<DropBoxCrawlJobData> state, IFileIndexer indexer, IDropBoxClient client)
+        public FileMetadataClueProducer([NotNull] IClueFactory factory, ILogger log, BoxFileUriBuilder uriBuilder, AgentJobProcessorState<DropBoxCrawlJobData> state, IFileIndexer indexer, IDropBoxClientFactory clientFactory)
         {
+            if (clientFactory == null) throw new ArgumentNullException(nameof(clientFactory));
+
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
+            
             _log = log ?? throw new ArgumentNullException(nameof(log));
             _uriBuilder = uriBuilder ?? throw new ArgumentNullException(nameof(uriBuilder));
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _indexer = indexer ?? throw new ArgumentNullException(nameof(indexer));
-            _client = client ?? throw new ArgumentNullException(nameof(client));
 
             if (factory is DropBoxClueFactory dropBoxClueFactory)
                 _providerRoot = dropBoxClueFactory.ProviderRoot; // TODO think of better way of doing referencing the base provider clue
+
+            _client = clientFactory.CreateNew(_state.JobData);
         }
 
         protected override Clue MakeClueImpl([NotNull] FileMetadata input, Guid accountId)

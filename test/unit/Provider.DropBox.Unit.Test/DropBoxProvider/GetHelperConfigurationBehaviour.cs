@@ -5,6 +5,7 @@ using AutoFixture.Xunit2;
 using Should;
 using Xunit;
 using CluedIn.Crawling.DropBox.Core;
+using Dropbox.Api;
 
 namespace Provider.DropBox.Unit.Test.DropBoxProvider
 {
@@ -14,7 +15,7 @@ namespace Provider.DropBox.Unit.Test.DropBoxProvider
 
     public GetHelperConfigurationBehaviour()
     {
-      _jobData = new DropBoxCrawlJobData();
+      _jobData = new DropBoxCrawlJobData(DropBoxConfiguration.Create());
     }
 
     [Fact]

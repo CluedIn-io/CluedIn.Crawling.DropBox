@@ -20,6 +20,9 @@ namespace CluedIn.Crawling.DropBox.Factories
             if (clue == null)
                 throw new ArgumentNullException(nameof(clue));
 
+
+            clue.ValidationRuleSuppressions.Add(Constants.Validation.Rules.PROPERTIES_001_MustExist);
+            
             var data = clue.Data.EntityData;
             data.Name = DropBoxConstants.CrawlerName;
             data.Uri = new Uri(DropBoxConstants.Uri);

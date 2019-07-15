@@ -10,6 +10,12 @@ namespace CluedIn.Crawling.DropBox.Core
         public struct KeyName
         {
             public static readonly string ApiKey = nameof(ApiKey);
+            public static readonly string BaseUri = nameof(BaseUri);
+            public static readonly string AccessToken = nameof(AccessToken);
+            public static readonly string LastCursor = nameof(LastCursor);
+            public static readonly string Accounts = nameof(Accounts);
+            public static readonly string ClientId = "Providers.DropBoxClientId";
+            public static readonly string ClientSecret = "Providers.DropBoxClientSecret";
         }
 
         public const string CodeOrigin = "DropBox";
@@ -19,15 +25,15 @@ namespace CluedIn.Crawling.DropBox.Core
         public const string CrawlerDescription = "DropBox is a web and mobile application designed to enable sharing and storage of files.";
         public const string CrawlerDisplayName = "DropBox";
         public const string Uri = "https://www.dropbox.com/home ";
-        public const string ApiUri = "https://api.dropboxapi.com/2";
+        public const string ApiUri = "https://api.dropboxapi.com/2";    // TODO Does this come from configuration?
 
 
-        public const string ClientID = "123456";
-        public const string ClientSecret = "12345";
+        //public const string ClientID = "123456";
+        //public const string ClientSecret = "12345";
 
 
-        public static readonly Guid ProviderId = Guid.Parse("203284c2-23a8-4bd5-a73d-252b89461317");   // TODO: Replace value
-        public const string ProviderName = "DropBox";         // TODO: Replace value
+        public static readonly Guid ProviderId = Guid.Parse("32811664-085F-4551-BCD0-033CC5171179"); 
+        public const string ProviderName = "DropBox";         
         public const bool SupportsConfiguration = true;             // TODO: Replace value
         public const bool SupportsWebHooks = false;             // TODO: Replace value
         public const bool SupportsAutomaticWebhookCreation = true;             // TODO: Replace value

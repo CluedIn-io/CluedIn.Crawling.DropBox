@@ -8,14 +8,13 @@ using Newtonsoft.Json.Linq;
 
 namespace CluedIn.Crawling.DropBox.Core
 {
-  public class DropBoxCrawlJobData : CrawlJobData
-  {
-    public string ApiKey { get; set; }
-    private readonly IDictionary<string, object> _configuration;
+    public class DropBoxCrawlJobData : CrawlJobData
+    {
+        private readonly IDictionary<string, object> _configuration;
 
-        public DropBoxCrawlJobData()
-        {
-        }
+        //public DropBoxCrawlJobData()
+        //{
+        //}
 
         public DropBoxCrawlJobData(IDictionary<string, object> configuration)
         {
@@ -170,5 +169,7 @@ namespace CluedIn.Crawling.DropBox.Core
         public bool IsAuthenticated { get; set; }
 
         public long? FileSizeLimit { get; set; }
+
+        public string ApiKey { get; set; }
     }
 }

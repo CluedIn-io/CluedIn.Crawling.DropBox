@@ -19,9 +19,8 @@ namespace Crawling.DropBox.Unit.Test
     {
         var nameClientFactory = new Mock<IDropBoxClientFactory>();
         var log = new Mock<ILogger>();
-        var state = new Mock<AgentJobProcessorState<DropBoxCrawlJobData>>();
 
-        _sut = new DropBoxCrawler(nameClientFactory.Object, log.Object, state.Object);
+        _sut = new DropBoxCrawler(nameClientFactory.Object, log.Object);
     }
 
     [Fact]

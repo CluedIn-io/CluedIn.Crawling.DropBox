@@ -50,7 +50,7 @@ namespace CluedIn.Provider.DropBox.WebHooks
 
                     if (jobDataCheck != null)
                     {
-                        var crawlJobData = new DropBoxCrawlJobData();
+                        var crawlJobData = new DropBoxCrawlJobData(configStoreData);
 
                         var clues = new List<Clue>();
 

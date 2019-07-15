@@ -4,6 +4,6 @@ namespace CluedIn.Crawling.DropBox.Infrastructure.Factories
 {
     public interface IDropBoxClientFactory
     {
-        DropBoxClient CreateNew(DropBoxCrawlJobData dropboxCrawlJobData);
+        IDropBoxClient CreateNew(DropBoxCrawlJobData dropboxCrawlJobData);
     }
 }

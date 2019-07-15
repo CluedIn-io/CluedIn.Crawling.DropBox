@@ -12,6 +12,7 @@ using System.Linq;
 using CluedIn.Core.Configuration;
 using CluedIn.Core.Data;
 using CluedIn.Core.DataStore;
+using CluedIn.Core.Logging;
 using CluedIn.Core.Messages.WebApp;
 using CluedIn.Core.Net.Mail;
 using CluedIn.Core.Security;
@@ -28,11 +29,13 @@ namespace CluedIn.Provider.DropBox
     public class DropBoxProvider : ProviderBase
     {
         private readonly IDropBoxClientFactory _dropboxClientFactory;
+        private readonly ILogger _log;
 
-        public DropBoxProvider([NotNull] ApplicationContext appContext, IDropBoxClientFactory dropboxClientFactory)
+        public DropBoxProvider([NotNull] ApplicationContext appContext, IDropBoxClientFactory dropboxClientFactory, ILogger log)
             : base(appContext, DropBoxConstants.CreateProviderMetadata())
         {
-            _dropboxClientFactory = dropboxClientFactory;
+            _dropboxClientFactory = dropboxClientFactory ?? throw new ArgumentNullException(nameof(dropboxClientFactory));
+            _log = log ?? throw new ArgumentNullException(nameof(log));
         }
 
 
@@ -46,7 +49,7 @@ namespace CluedIn.Provider.DropBox
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
 
-            var dropboxCrawlJobData = new DropBoxCrawlJobData();
+            var dropboxCrawlJobData = new DropBoxCrawlJobData(configuration);
             if (configuration.ContainsKey(DropBoxConstants.KeyName.ApiKey))
             { dropboxCrawlJobData.ApiKey = configuration[DropBoxConstants.KeyName.ApiKey].ToString(); }
 
@@ -72,7 +75,7 @@ namespace CluedIn.Provider.DropBox
             }
             catch (Exception exception)
             {
-                context.Log.Warn(() => "Could not add DropBox provider", exception);
+                _log.Warn(() => "Could not add DropBox provider", exception);
                 return false;
             }
 
@@ -203,7 +206,7 @@ namespace CluedIn.Provider.DropBox
                 }
                 catch (Exception exception)
                 {
-                    context.Log.Warn(() => "Could not add DropBox provider", exception);
+                    _log.Warn(() => "Could not add DropBox provider", exception);
                     return new Dictionary<string, object>() { { "error", "Could not fetch configuration data from DropBox" } };
                 }
             }
@@ -300,7 +303,7 @@ namespace CluedIn.Provider.DropBox
                             }
                             catch (Exception exception)
                             {
-                                context.Log.Warn(() => "Could not alert users of changed configuration.", exception);
+                                _log.Warn(() => "Could not alert users of changed configuration.", exception);
                             }
                         }
                     }
