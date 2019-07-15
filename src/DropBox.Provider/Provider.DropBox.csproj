@@ -4,6 +4,7 @@
     <AssemblyName>CluedIn.Provider.DropBox</AssemblyName>
     <TargetFramework>net452</TargetFramework>
     <Product>CluedIn.Provider.DropBox</Product>
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Configuration" />
