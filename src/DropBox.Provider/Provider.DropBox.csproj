@@ -1,69 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <SkipValidatePackageReferences>true</SkipValidatePackageReferences>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E1744515-A08B-4972-9185-0D56131AC429}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CluedIn.Provider.DropBox</RootNamespace>
     <AssemblyName>CluedIn.Provider.DropBox</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net452</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <AssemblyTitle>Template.Provider</AssemblyTitle>
+    <Product>Template.Provider</Product>
+    <WarningsAsErrors>CS1998</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
     <OutputPath>.\bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <WarningsAsErrors>CS1998</WarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <WarningsAsErrors>CS1998</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
     <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Mesh\DropBoxMeshProcessor.cs" />
-    <Compile Include="WebApi\DropBoxController.cs" />
-    <Compile Include="WebApi\DropBoxOAuthController.cs" />
-    <Compile Include="WebHooks\DropBoxWebhookPreValidator.cs" />
-    <Compile Include="WebHooks\DropBoxWebhookProcessor.cs" />
-    <Compile Include="DropBoxProvider.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DropBoxProviderComponent.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DropBox.Core\Crawling.DropBox.Core.csproj">
-      <Project>{46d89bed-5f80-454b-9496-3163759dbeb4}</Project>
-      <Name>Crawling.DropBox.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DropBox.Infrastructure\Crawling.DropBox.Infrastructure.csproj">
-      <Project>{de5be162-01c7-4d2f-98f4-144e2eeb5993}</Project>
-      <Name>Crawling.DropBox.Infrastructure</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\DropBox.Core\Crawling.DropBox.Core.csproj" />
+    <ProjectReference Include="..\DropBox.Infrastructure\Crawling.DropBox.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DropBoxProviderComponent.config">
@@ -79,9 +32,7 @@
     <PackageReference Include="CluedIn.Server" Version="2.18.0-pullrequest0724-0841" />
     <PackageReference Include="CluedIn.Server.Common.WebApi" Version="2.18.0-alpha0846" />
     <PackageReference Include="ComponentHost" Version="1.0.0.46" />
-    <PackageReference Include="Dropbox.Api">
-      <Version>4.9.4</Version>
-    </PackageReference>
+    <PackageReference Include="Dropbox.Api" Version="4.9.4" />
     <PackageReference Include="EntityFramework" Version="6.1.2" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.2" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.2" />
@@ -95,15 +46,4 @@
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.3" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
