@@ -3,15 +3,7 @@
     <RootNamespace>CluedIn.Crawling.DropBox</RootNamespace>
     <AssemblyName>CluedIn.Crawling.DropBox</AssemblyName>
     <TargetFramework>net452</TargetFramework>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>Template.Crawling</AssemblyTitle>
-    <Product>Template.Crawling</Product>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>.\bin\Debug</OutputPath>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
+    <Product>CluedIn.Crawling.DropBox</Product>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\DropBox.Core\Crawling.DropBox.Core.csproj" />
