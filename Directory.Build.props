@@ -18,7 +18,7 @@
 
     <Description>Internal CluedIn Assembly</Description>
 
-    <RepositoryUrl>https://github.com/CluedIn-io/CluedIn.Csharp.Template.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/CluedIn-io/CluedIn.Crawling.DropBox.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
 
