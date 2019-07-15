@@ -19,10 +19,6 @@ To use the `DropBox` crawler and provider with the `CluedIn` server you will hav
 ```PowerShell
 Install-Package CluedIn.Crawling.DropBox
 
-Install-Package CluedIn.Crawling.DropBox.Core
-
-Install-Package CluedIn.Crawling.DropBox.Infrastructure
-
 Install-Package CluedIn.Provider.DropBox
 ```
 
