@@ -14,11 +14,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Dropbox.Api">
-      <HintPath>C:\Users\benfi\.nuget\packages\dropbox.api\4.9.4\lib\net45\Dropbox.Api.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\DropBox.Core\Crawling.DropBox.Core.csproj" />
     <ProjectReference Include="..\DropBox.Infrastructure\Crawling.DropBox.Infrastructure.csproj" />
   </ItemGroup>

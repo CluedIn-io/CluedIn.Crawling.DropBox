@@ -10,12 +10,10 @@
     <OutputPath>.\bin\Debug</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Dropbox.Api" Version="4.9.4" />
     <PackageReference Include="System.Management" Version="4.*" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Dropbox.Api">
-      <HintPath>C:\Users\benfi\.nuget\packages\dropbox.api\4.9.4\lib\net45\Dropbox.Api.dll</HintPath>
-    </Reference>
     <Reference Include="System.Configuration.Install" />
   </ItemGroup>
   <ItemGroup>
