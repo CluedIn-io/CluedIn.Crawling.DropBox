@@ -7,7 +7,7 @@
 
   <PropertyGroup>
 
-    <!-- <RepositoryUrl>TODO</RepositoryUrl> -->
+    <RepositoryUrl>https://github.com/CluedIn-io/CluedIn.Crawling.DropBox.git</RepositoryUrl> 
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
 

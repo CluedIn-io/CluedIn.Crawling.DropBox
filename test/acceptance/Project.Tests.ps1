@@ -24,22 +24,6 @@ Describe 'Project Tests' -Tags 'Acceptance' , 'Quality' {
 
                 $projectFile = $_ | Select-Object -ExpandProperty FullName
 
-                $expectedPatterns = @(
-                    '<OutputPath>bin\$(Configuration)\</OutputPath>'
-                )
-
-                $expectedPatterns | ForEach-Object {
-
-                    $pattern = $_
-
-                    It "$pattern found in $projectFile" {
-
-                        Get-Content $projectFile |
-                            Select-String -SimpleMatch $pattern |
-                                Should -Not -BeNullOrEmpty
-                    }
-                }
-
                 $removedPatterns = @(
                     'HintPath' ,
                     'packages.config' ,
