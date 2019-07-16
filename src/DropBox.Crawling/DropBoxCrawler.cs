@@ -77,11 +77,11 @@ namespace CluedIn.Crawling.DropBox
                     var folders = (jobData.Folders?.Select(sp => sp.EntryPoint) ?? new string[] { }).ToHashSet();
 
                     if (!folders.Any() || folders.Contains("/") || folders.Contains(string.Empty))
-                        GetFolderItemsAsync(options, client, jobData, "/", visitedFolders: new HashSet<string>(), list);
+                        GetFolderItemsAsync(options, client, jobData,"/", new HashSet<string>(), list);
                     else
                     {
                         foreach (var path in folders)
-                            GetFolderItemsAsync(options, client, jobData, path, visitedFolders: new HashSet<string>(), list);
+                            GetFolderItemsAsync(options, client, jobData, path, new HashSet<string>(), list);
                     }
                 }
 
