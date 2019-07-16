@@ -5,6 +5,7 @@ using AutoFixture.Xunit2;
 using Should;
 using Xunit;
 using CluedIn.Crawling.DropBox.Core;
+using CluedIn.Crawling.DropBox.Test.Common;
 using Dropbox.Api;
 
 namespace Provider.DropBox.Unit.Test.DropBoxProvider

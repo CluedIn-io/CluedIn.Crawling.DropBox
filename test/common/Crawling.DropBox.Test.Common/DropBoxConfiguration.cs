@@ -4,7 +4,7 @@ using CluedIn.Core.Configuration;
 using CluedIn.Core.Security;
 using CluedIn.Crawling.DropBox.Core;
 
-namespace Crawling.DropBox.Integration.Test
+namespace CluedIn.Crawling.DropBox.Test.Common
 {
   public static class DropBoxConfiguration
   {

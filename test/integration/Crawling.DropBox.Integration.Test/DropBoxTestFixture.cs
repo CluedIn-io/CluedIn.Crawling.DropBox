@@ -2,6 +2,7 @@ using CluedIn.Crawling;
 using CluedIn.Crawling.DropBox.Core;
 using System.IO;
 using System.Reflection;
+using CluedIn.Crawling.DropBox.Test.Common;
 using CrawlerIntegrationTesting.Clues;
 
 namespace Crawling.DropBox.Integration.Test
