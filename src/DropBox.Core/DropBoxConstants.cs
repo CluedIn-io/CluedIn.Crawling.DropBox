@@ -11,7 +11,9 @@ namespace CluedIn.Crawling.DropBox.Core
         {
             public static readonly string ApiKey = nameof(ApiKey);
             public static readonly string BaseUri = nameof(BaseUri);
+            public static readonly string AdminMemberId = nameof(AdminMemberId);
             public static readonly string AccessToken = nameof(AccessToken);
+            public static readonly string Folders = nameof(Folders);
             public static readonly string LastCursor = nameof(LastCursor);
             public static readonly string Accounts = nameof(Accounts);
             public static readonly string ClientId = "Providers.DropBoxClientId";

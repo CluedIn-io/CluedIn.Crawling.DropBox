@@ -31,8 +31,11 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
             _restClient.BaseUrl = string.IsNullOrEmpty(dropBoxCrawlJobData.BaseUri) ? new Uri(DropBoxConstants.ApiUri) : new Uri(dropBoxCrawlJobData.BaseUri);
             _restClient.AddDefaultParameter("api_key", dropBoxCrawlJobData.ApiKey, ParameterType.QueryString);
             _restClient.AddDefaultHeader("Authorization", "Bearer " + dropBoxCrawlJobData.Token.AccessToken);
+            _restClient.AddDefaultHeader("API-Select-Admin", dropBoxCrawlJobData.AdminMemberId); // TODO confirm we want to access as admin in DropBox Business accounts (see https://www.dropbox.com/developers/documentation/http/teams)
 
             _dropBoxClient = new DropboxClient(dropBoxCrawlJobData.Token.AccessToken); // TODO figure out to DI this
+                                                                          
+       
         }
 
 
