@@ -157,7 +157,7 @@ namespace CluedIn.Crawling.DropBox
                 //_state.Status.Statistics.Tasks.IncrementTaskFailureCount(); TODO find out how to access state
             }
 
-            return default;
+            return Enumerable.Empty<object>();
         }
 
         private IEnumerable<object> GetSharedFolders(CrawlOptions options, IDropBoxClient client)
@@ -201,7 +201,7 @@ namespace CluedIn.Crawling.DropBox
                 // _state.Status.Statistics.Tasks.IncrementTaskFailureCount(); TODO find out how to access state
             }
 
-            return default;
+            return Enumerable.Empty<object>();
         }
 
         private IEnumerable<object> EnumerateFolderItems(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, ListFolderResult items, DateTimeOffset dateTime, bool iterateFolders = true, HashSet<string> visitedFolders = null)
@@ -253,9 +253,13 @@ namespace CluedIn.Crawling.DropBox
                     }
 
                     if (items.HasMore)
+                    {
                         items = client.ListFolderContinueAsync(items.Cursor).Result;
+                    }
                     else
+                    {
                         break;
+                    }
                 }
                 while (items != null); //  && !_state.CancellationTokenSource.IsCancellationRequested); TODO find out how to access state
             }
@@ -283,14 +287,14 @@ namespace CluedIn.Crawling.DropBox
         private IEnumerable<object> GetFolderItemsAsync(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, string path, HashSet<string> visitedFolders)
         {
             //if (_state.CancellationTokenSource.IsCancellationRequested) TODO find out how to access state
-            //    return default;
+            //    return Enumerable.Empty<object>();
 
             path = NormalizePath(path);
 
             if (visitedFolders != null)
             {
                 if (visitedFolders.Contains(path))
-                    return default;
+                    return Enumerable.Empty<object>();
 
                 visitedFolders.Add(path);
             }
@@ -312,7 +316,7 @@ namespace CluedIn.Crawling.DropBox
                 // _state.Status.Statistics.Tasks.IncrementTaskFailureCount(); TODO find out how to access state
             }
 
-            return default;
+            return Enumerable.Empty<object>();
         }
 
         private Metadata GetFileAsync(FileMetadata file, IDropBoxClient client, DateTimeOffset dateTime)
@@ -328,7 +332,7 @@ namespace CluedIn.Crawling.DropBox
                     foreach (var version in versions.Entries)
                     {
                         //if (_state.CancellationTokenSource.IsCancellationRequested)  TODO find out how to access state
-                        //    return default;
+                        //    return default(Metadata);
 
                         if (version.ServerModified < dateTime)
                             continue;
@@ -337,7 +341,9 @@ namespace CluedIn.Crawling.DropBox
                     }
                 }
                 else
+                {
                     return file;
+                }
             }
             catch (OperationCanceledException)
             {
@@ -370,7 +376,7 @@ namespace CluedIn.Crawling.DropBox
                 }
             }
 
-            return default;
+            return default(Metadata);
         }
         
         private DateTimeOffset GetModifiedLastCrawlFinishTime(DropBoxCrawlJobData jobData)

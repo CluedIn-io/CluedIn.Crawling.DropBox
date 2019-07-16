@@ -10,12 +10,10 @@
     <OutputPath>.\bin\Debug</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Management" Version="4.*" />
+    <PackageReference Include="Dropbox.Api" Version="4.9.4" />
+    <PackageReference Include="System.Management" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Dropbox.Api">
-      <HintPath>C:\Users\benfi\.nuget\packages\dropbox.api\4.9.4\lib\net45\Dropbox.Api.dll</HintPath>
-    </Reference>
     <Reference Include="System.Configuration.Install" />
   </ItemGroup>
   <ItemGroup>
@@ -23,8 +21,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
-    <PackageReference Include="System.Net.Http" Version="4.3.3" />
-    <PackageReference Include="RestSharp" Version="105.2.3" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="RestSharp" Version="106.6.10" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
   </ItemGroup>
