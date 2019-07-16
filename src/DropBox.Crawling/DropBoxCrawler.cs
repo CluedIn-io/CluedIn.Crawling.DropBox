@@ -11,6 +11,7 @@ using CluedIn.Core.Logging;
 using CluedIn.Crawling.DropBox.Core;
 using CluedIn.Crawling.DropBox.Infrastructure;
 using CluedIn.Crawling.DropBox.Infrastructure.Factories;
+using com.sun.org.apache.bcel.@internal.generic;
 using Dropbox.Api.Files;
 
 namespace CluedIn.Crawling.DropBox
@@ -44,12 +45,12 @@ namespace CluedIn.Crawling.DropBox
 
                 var client = _clientFactory.CreateNew(crawlerJobData);
 
-                var data = new List<object> { client.GetCurrentAccountAsync().Result };
+                var list = new List<object> { client.GetCurrentAccountAsync().Result };
 
-                data.AddRange(GetFolderItemsAsync(CrawlOptions.Recursive, client, crawlerJobData));
-                data.AddRange(GetSharedFolders(CrawlOptions.Recursive, client));
+                GetFolderItemsAsync(CrawlOptions.Recursive, client, crawlerJobData, list);
+                GetSharedFolders(CrawlOptions.Recursive, client, list);
 
-                return data;
+                return list;
             }
             catch (AggregateException e)
             {
@@ -59,12 +60,11 @@ namespace CluedIn.Crawling.DropBox
         }
 
 
-        private IEnumerable<object> GetFolderItemsAsync(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData)
+        private void GetFolderItemsAsync(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, IList<object> list)
         {
             //if (_state.CancellationTokenSource.IsCancellationRequested)
             //	return EmptyResult;
 
-            var result = new List<object>();
 
             try
             {
@@ -72,18 +72,18 @@ namespace CluedIn.Crawling.DropBox
                 if (jobData.LastCrawlFinishTime > DateTimeOffset.MinValue && jobData.LastestCursors != null && jobData.LastestCursors.ContainsKey("Files") && !string.IsNullOrEmpty(jobData.LastestCursors["Files"]))
                 {
                     var cursor = jobData.LastestCursors["Files"];
-                    result.AddRange(GetFolderItemsFromCursorAsync(options, cursor, client, jobData));
+                    GetFolderItemsFromCursorAsync(options, cursor, client, jobData, list);
                 }
                 else
                 {
                     var folders = (jobData.Folders?.Select(sp => sp.EntryPoint) ?? new string[] { }).ToHashSet();
 
                     if (!folders.Any() || folders.Contains("/") || folders.Contains(string.Empty))
-                        result.AddRange(GetFolderItemsAsync(options, client, jobData, "/", visitedFolders: new HashSet<string>()));
+                        GetFolderItemsAsync(options, client, jobData, "/", visitedFolders: new HashSet<string>(), list);
                     else
                     {
                         foreach (var path in folders)
-                            result.AddRange(GetFolderItemsAsync(options, client, jobData, path, visitedFolders: new HashSet<string>()));
+                            GetFolderItemsAsync(options, client, jobData, path, visitedFolders: new HashSet<string>(), list);
                     }
                 }
 
@@ -101,8 +101,6 @@ namespace CluedIn.Crawling.DropBox
                 //_state.Status.Statistics.Tasks.IncrementTaskFailureCount();  // TODO find out how to access state
                 //_state.Result.Exceptions.Add(ex);
             }
-
-            return result;
         }
 
         private void SetCursor(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData)
@@ -131,13 +129,13 @@ namespace CluedIn.Crawling.DropBox
             }
         }
 
-        private IEnumerable<object> GetFolderItemsFromCursorAsync(CrawlOptions options, string cursor, IDropBoxClient client, DropBoxCrawlJobData jobData)
+        private void GetFolderItemsFromCursorAsync(CrawlOptions options, string cursor, IDropBoxClient client, DropBoxCrawlJobData jobData, IList<object> list)
         {
             //if (_state.CancellationTokenSource.IsCancellationRequested) TODO find out how to access state
             //    return EmptyResult;
 
             if (string.IsNullOrEmpty(cursor))
-                return EmptyResult;
+                return;
 
             var dateTime = GetModifiedLastCrawlFinishTime(jobData);
 
@@ -145,8 +143,7 @@ namespace CluedIn.Crawling.DropBox
             {
                 var items = client.ListFolderContinueAsync(jobData.LastestCursors["Files"]).Result;
 
-
-                return EnumerateFolderItems(options, client, jobData, items, dateTime, iterateFolders: false);
+                EnumerateFolderItems(options, client, jobData, items, dateTime, list);
             }
             catch (OperationCanceledException)
             {
@@ -156,11 +153,9 @@ namespace CluedIn.Crawling.DropBox
                 _log.Error(() => "Could not fetch data from path in Dropbox", exception);
                 //_state.Status.Statistics.Tasks.IncrementTaskFailureCount(); TODO find out how to access state
             }
-
-            return Enumerable.Empty<object>();
         }
 
-        private IEnumerable<object> GetSharedFolders(CrawlOptions options, IDropBoxClient client)
+        private void GetSharedFolders(CrawlOptions options, IDropBoxClient client, IList<object> list)
         {
             //if (_state.CancellationTokenSource.IsCancellationRequested) TODO find out how to access state
             //    return EmptyResult;
@@ -171,9 +166,9 @@ namespace CluedIn.Crawling.DropBox
                 var sharedFolders = client.ListFoldersAsync().Result;
 
                 if (sharedFolders == null)
-                    return EmptyResult;
+                    return;
 
-                var result = new List<object>();
+
                 do
                 {
                     foreach (var sharedFolder in sharedFolders.Entries)
@@ -181,7 +176,7 @@ namespace CluedIn.Crawling.DropBox
                         //if (_state.CancellationTokenSource.IsCancellationRequested) TODO find out how to access state
                         //    break;
 
-                        result.Add(sharedFolder);
+                        list.Add(sharedFolder);
                     }
 
                     if (!string.IsNullOrEmpty(sharedFolders.Cursor))
@@ -189,8 +184,6 @@ namespace CluedIn.Crawling.DropBox
                     else
                         break;
                 } while (sharedFolders != null); // && !_state.CancellationTokenSource.IsCancellationRequested); TODO find out how to access state
-
-                return result;
             }
             catch (OperationCanceledException)
             {
@@ -200,17 +193,14 @@ namespace CluedIn.Crawling.DropBox
                 _log.Error(() => "Could not fetch data from Dropbox", exception);
                 // _state.Status.Statistics.Tasks.IncrementTaskFailureCount(); TODO find out how to access state
             }
-
-            return Enumerable.Empty<object>();
         }
 
-        private IEnumerable<object> EnumerateFolderItems(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, ListFolderResult items, DateTimeOffset dateTime, bool iterateFolders = true, HashSet<string> visitedFolders = null)
+        private void EnumerateFolderItems(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, ListFolderResult items, DateTimeOffset dateTime, IList<object> list, bool iterateFolders = true, HashSet<string> visitedFolders = null)
         {
             //if (_state.CancellationTokenSource.IsCancellationRequested)  TODO find out how to access state
             //    return EmptyResult; 
 
 
-            var result = new List<object>();
             try
             {
                 var ids = jobData.Folders?.Select(sp => sp.EntryPoint) ?? new string[] { };
@@ -235,7 +225,7 @@ namespace CluedIn.Crawling.DropBox
                         //if (_state.CancellationTokenSource.IsCancellationRequested)
                         //    return;
 
-                        result.Add(GetFileAsync(file, client, dateTime));
+                        list.Add(GetFileAsync(file, client, dateTime));
                     });
 
                     foreach (var folder in folders)
@@ -245,10 +235,10 @@ namespace CluedIn.Crawling.DropBox
 
                         if (!ids.Any() || ids.Contains(folder.PathLower))
                         {
-                            result.Add(folder);
+                            list.Add(folder);
 
                             if (iterateFolders)
-                                result.Add(GetFolderItemsAsync(options, client, jobData, folder.PathLower, visitedFolders));
+                                GetFolderItemsAsync(options, client, jobData, folder.PathLower, visitedFolders, list);
                         }
                     }
 
@@ -271,8 +261,6 @@ namespace CluedIn.Crawling.DropBox
                 _log.Error(() => "Could not enumerate folder items in Dropbox", exception);
                 //_state.Status.Statistics.Tasks.IncrementTaskFailureCount();TODO find out how to access state
             }
-
-            return result;
         }
         private static string NormalizePath(string path)
         {
@@ -284,7 +272,7 @@ namespace CluedIn.Crawling.DropBox
             return path;
         }
 
-        private IEnumerable<object> GetFolderItemsAsync(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, string path, HashSet<string> visitedFolders)
+        private void GetFolderItemsAsync(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, string path, HashSet<string> visitedFolders, IList<object> list)
         {
             //if (_state.CancellationTokenSource.IsCancellationRequested) TODO find out how to access state
             //    return Enumerable.Empty<object>();
@@ -294,7 +282,7 @@ namespace CluedIn.Crawling.DropBox
             if (visitedFolders != null)
             {
                 if (visitedFolders.Contains(path))
-                    return Enumerable.Empty<object>();
+                    return;
 
                 visitedFolders.Add(path);
             }
@@ -305,7 +293,7 @@ namespace CluedIn.Crawling.DropBox
             {
                 var items = client.ListFolderAsync(path: path, includeDeleted: false).Result;
 
-                return EnumerateFolderItems(options, client, jobData, items, dateTime, iterateFolders: true, visitedFolders: visitedFolders);
+                EnumerateFolderItems(options, client, jobData, items, dateTime, list, iterateFolders: true, visitedFolders: visitedFolders);
             }
             catch (OperationCanceledException)
             {
@@ -315,8 +303,6 @@ namespace CluedIn.Crawling.DropBox
                 _log.Error(() => "Could not fetch data from path in Dropbox", exception);
                 // _state.Status.Statistics.Tasks.IncrementTaskFailureCount(); TODO find out how to access state
             }
-
-            return Enumerable.Empty<object>();
         }
 
         private Metadata GetFileAsync(FileMetadata file, IDropBoxClient client, DateTimeOffset dateTime)

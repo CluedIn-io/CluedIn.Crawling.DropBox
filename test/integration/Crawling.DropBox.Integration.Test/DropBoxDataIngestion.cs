@@ -17,7 +17,7 @@ namespace Crawling.DropBox.Integration.Test
             
         }
 
-        [Theory(Skip = "Castle.MicroKernel.ComponentActivator.ComponentActivatorException : ComponentActivator: could not instantiate CluedIn.Crawling.DropBox.Infrastructure.DropBoxClient")]
+        [Theory(Skip="Not producing clues yet")]
         [InlineData("/Provider/Root", 1)] 
         [InlineData("/Files/Directory", 1)]
         [InlineData("/Files/File", 2)]
