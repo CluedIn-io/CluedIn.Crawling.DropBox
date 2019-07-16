@@ -15,15 +15,18 @@ namespace Crawling.DropBox.Integration.Test
 
             ClueStorage = new ClueStorage();
 
-            p.ProcessClue += ClueStorage.AddClue;            
+            p.ProcessClue += CrawlerHost_ProcessClue;            
 
             p.Execute(DropBoxConfiguration.Create(), DropBoxConstants.ProviderId);
         }
 
         public ClueStorage ClueStorage { get; }
 
-        public void Dispose()
+        private void CrawlerHost_ProcessClue(CluedIn.Core.Data.Clue clue)
         {
+            //_outputHelper.WriteLine($"Processing crawler clue {JsonConvert.SerializeObject(clue)}");
+
+            ClueStorage.AddClue(clue);
         }
 
     }

@@ -25,27 +25,27 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
                 _providerRoot = dropBoxClueFactory.ProviderRoot; // TODO think of better way of doing referencing the base provider clue
         }
 
-        protected override Clue MakeClueImpl(SharedFolderMetadata value, Guid accountId)
+        protected override Clue MakeClueImpl(SharedFolderMetadata input, Guid accountId)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
 
-            var clue = _factory.Create(EntityType.Files.Directory, value.SharedFolderId.ToString(CultureInfo.InvariantCulture), accountId);
+            var clue = _factory.Create(EntityType.Files.Directory, input.SharedFolderId.ToString(CultureInfo.InvariantCulture), accountId);
 
             var data = clue.Data.EntityData;
 
-            if (value.Name != null)
+            if (input.Name != null)
             {
-                data.Name = value.Name;
-                data.DisplayName = value.Name;
+                data.Name = input.Name;
+                data.DisplayName = input.Name;
             }
 
-            if (value.OwnerTeam != null)
+            if (input.OwnerTeam != null)
             {
-                data.Properties[DropBoxVocabulary.SharedFolder.Owner] = value.OwnerTeam.Name;
+                data.Properties[DropBoxVocabulary.SharedFolder.Owner] = input.OwnerTeam.Name;
                 try
                 {
-                    _factory.CreateOutgoingEntityReference(clue, EntityType.Infrastructure.Group, EntityEdgeType.Owns, value.OwnerTeam, value.OwnerTeam.Id);
+                    _factory.CreateOutgoingEntityReference(clue, EntityType.Infrastructure.Group, EntityEdgeType.Owns, input.OwnerTeam, input.OwnerTeam.Id);
                 }
                 catch (Exception)
                 {
@@ -53,8 +53,8 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
                 }
             }
 
-            if (value.PathLower != null)
-                data.Properties[DropBoxVocabulary.SharedFolder.FolderPath] = value.PathLower;
+            if (input.PathLower != null)
+                data.Properties[DropBoxVocabulary.SharedFolder.FolderPath] = input.PathLower;
 
             _factory.CreateOutgoingEntityReference(clue, EntityType.Provider.Root, EntityEdgeType.ManagedIn, _providerRoot, _providerRoot.OriginEntityCode.Value);
 

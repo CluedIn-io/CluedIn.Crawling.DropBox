@@ -12,7 +12,7 @@ using Dropbox.Api.Files;
 
 namespace CluedIn.Crawling.DropBox.ClueProducers
 {
-    public class FolderClueProducer : BaseClueProducer<Metadata>
+    public class FolderClueProducer : BaseClueProducer<FolderMetadata>
     {
         private readonly IClueFactory _factory;
         private readonly ILogger _log;
@@ -29,7 +29,7 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             if (factory is DropBoxClueFactory dropBoxClueFactory) _providerRoot = dropBoxClueFactory.ProviderRoot; // TODO think of better way of doing referencing the base provider clue
         }
 
-        protected override Clue MakeClueImpl(Metadata input, Guid accountId)
+        protected override Clue MakeClueImpl(FolderMetadata input, Guid accountId)
         {
             if (input == null)
                 throw new ArgumentNullException(nameof(input));

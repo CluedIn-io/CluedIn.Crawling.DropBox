@@ -27,13 +27,13 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
         private readonly IClueFactory _factory;
         private readonly ILogger _log;
         private readonly BoxFileUriBuilder _uriBuilder;
-        private readonly AgentJobProcessorState<DropBoxCrawlJobData> _state;
-        private readonly IFileIndexer _indexer;
-        private readonly IDropBoxClient _client;
+        // private readonly IFileIndexer _indexer; TODO figure out how to DI this?
         private readonly Clue _providerRoot;
         private readonly char[] _trimChars = { '/' };
+        // private readonly IDropBoxClient _client; TODO figure out how to get DropBoxClient when its created by a factory that requires state etc
 
-        public FileMetadataClueProducer([NotNull] IClueFactory factory, ILogger log, BoxFileUriBuilder uriBuilder, AgentJobProcessorState<DropBoxCrawlJobData> state, IFileIndexer indexer, IDropBoxClientFactory clientFactory)
+
+        public FileMetadataClueProducer([NotNull] IClueFactory factory, ILogger log, BoxFileUriBuilder uriBuilder, IDropBoxClientFactory clientFactory)
         {
             if (clientFactory == null) throw new ArgumentNullException(nameof(clientFactory));
 
@@ -41,13 +41,9 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             
             _log = log ?? throw new ArgumentNullException(nameof(log));
             _uriBuilder = uriBuilder ?? throw new ArgumentNullException(nameof(uriBuilder));
-            _state = state ?? throw new ArgumentNullException(nameof(state));
-            _indexer = indexer ?? throw new ArgumentNullException(nameof(indexer));
-
+           
             if (factory is DropBoxClueFactory dropBoxClueFactory)
                 _providerRoot = dropBoxClueFactory.ProviderRoot; // TODO think of better way of doing referencing the base provider clue
-
-            _client = clientFactory.CreateNew(_state.JobData);
         }
 
         protected override Clue MakeClueImpl([NotNull] FileMetadata input, Guid accountId)
@@ -103,24 +99,24 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             data.Properties[DropBoxVocabulary.File.ParentSharedFolderId] = value.ParentSharedFolderId.PrintIfAvailable();
             _factory.CreateOutgoingEntityReference(clue, EntityType.Provider.Root, EntityEdgeType.ManagedIn, _providerRoot, _providerRoot.OriginEntityCode.Value);
 
-            var shouldIndexFile = _state.JobData.FileSizeLimit == null ||
-                       _state.JobData.FileSizeLimit.Value == 0 ||
-                       (long)value.Size < _state.JobData.FileSizeLimit.Value;
+            clue.ValidationRuleSuppressions.Add(Constants.Validation.Rules.DATA_001_File_MustBeIndexed); // TODO Remove this when file indexing figured out
 
-            if (shouldIndexFile)
-            {
-                try
-                {
-                    Task.Run(() => _indexer.Index(value, clue).ConfigureAwait(false));
-                }
-                catch (OperationCanceledException)
-                {
-                }
-                catch (Exception exc)
-                {
-                    _log.Warn(() => "Could not index Dropbox File", exc); //Handle error
-                }
-            }
+            // var shouldIndexFile =  _state.FileSizeLimit == null || _state.FileSizeLimit.Value == 0 || (long)value.Size < _state.FileSizeLimit.Value; TODO find out how to get "state" object in
+
+            //if (shouldIndexFile) TODO this reliant on FileIndexer which needs CI figuring out. See ctor above
+            //{
+            //    try
+            //    {
+            //        Task.Run(() => _indexer.Index(value, clue).ConfigureAwait(false));
+            //    }
+            //    catch (OperationCanceledException)
+            //    {
+            //    }
+            //    catch (Exception exc)
+            //    {
+            //        _log.Warn(() => "Could not index Dropbox File", exc); //Handle error
+            //    }
+            //}
 
             if (data.PreviewImage == null)
             {
@@ -143,21 +139,22 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
                 {
                     try
                     {
-                        var thumbnail =  _client.GetThumbnailAsync(value.PathLower, ThumbnailFormat.Jpeg.Instance, ThumbnailSize.W1024h768.Instance).Result;
+                        // TODO Implement _client.GetThumbnailAsync
+                        //var thumbnail =  _client.GetThumbnailAsync(value.PathLower, ThumbnailFormat.Jpeg.Instance, ThumbnailSize.W1024h768.Instance).Result;
 
-                        var bytes = thumbnail.GetContentAsByteArrayAsync().Result;
-                        var rawDataPart = new RawDataPart()
-                        {
-                            Type = "/RawData/PreviewImage",
-                            MimeType = CluedIn.Core.FileTypes.MimeType.Jpeg.Code,
-                            FileName = "preview_{0}".FormatWith(data.OriginEntityCode.Key),
-                            RawDataMD5 = FileHashUtility.GetMD5Base64String(bytes),
-                            RawData = Convert.ToBase64String(bytes)
-                        };
+                        //var bytes = thumbnail.GetContentAsByteArrayAsync().Result;
+                        //var rawDataPart = new RawDataPart()
+                        //{
+                        //    Type = "/RawData/PreviewImage",
+                        //    MimeType = CluedIn.Core.FileTypes.MimeType.Jpeg.Code,
+                        //    FileName = "preview_{0}".FormatWith(data.OriginEntityCode.Key),
+                        //    RawDataMD5 = FileHashUtility.GetMD5Base64String(bytes),
+                        //    RawData = Convert.ToBase64String(bytes)
+                        //};
 
-                        clue.Details.RawData.Add(rawDataPart);
+                        //clue.Details.RawData.Add(rawDataPart);
 
-                        data.PreviewImage = new ImageReferencePart(rawDataPart);
+                        //data.PreviewImage = new ImageReferencePart(rawDataPart);
                     }
                     catch (OperationCanceledException)
                     {

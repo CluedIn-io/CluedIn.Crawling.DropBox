@@ -17,9 +17,9 @@ namespace Crawling.DropBox.Integration.Test
             
         }
 
-        [Theory(Skip="Not producing clues yet")]
+        [Theory]
         [InlineData("/Provider/Root", 1)] 
-        [InlineData("/Files/Directory", 1)]
+        [InlineData("/Files/Directory", 2)]
         [InlineData("/Files/File", 2)]
         public void CorrectNumberOfEntityTypes(string entityType, int expectedCount)
         {
@@ -27,7 +27,7 @@ namespace Crawling.DropBox.Integration.Test
             Assert.Equal(expectedCount, foundCount);
         }
 
-        [Fact(Skip = "Castle.MicroKernel.ComponentActivator.ComponentActivatorException : ComponentActivator: could not instantiate CluedIn.Crawling.DropBox.Infrastructure.DropBoxClient")]
+        [Fact]
         public void EntityCodesAreUnique()
         {            
             var count = _fixture.ClueStorage.Clues.Count();

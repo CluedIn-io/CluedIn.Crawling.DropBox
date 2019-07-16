@@ -4,14 +4,12 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using CluedIn.Core;
-using CluedIn.Core.Agent.Jobs;
 using CluedIn.Core.Configuration;
 using CluedIn.Core.Crawling;
 using CluedIn.Core.Logging;
 using CluedIn.Crawling.DropBox.Core;
 using CluedIn.Crawling.DropBox.Infrastructure;
 using CluedIn.Crawling.DropBox.Infrastructure.Factories;
-using com.sun.org.apache.bcel.@internal.generic;
 using Dropbox.Api.Files;
 
 namespace CluedIn.Crawling.DropBox
@@ -63,7 +61,7 @@ namespace CluedIn.Crawling.DropBox
         private void GetFolderItemsAsync(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, IList<object> list)
         {
             //if (_state.CancellationTokenSource.IsCancellationRequested)
-            //	return EmptyResult;
+            //	return;
 
 
             try

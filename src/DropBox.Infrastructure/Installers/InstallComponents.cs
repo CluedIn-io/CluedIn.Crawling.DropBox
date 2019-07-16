@@ -27,6 +27,9 @@ namespace CluedIn.Crawling.DropBox.Infrastructure.Installers
 
       if (!container.Kernel.HasComponent(typeof(IRestClient)) && !container.Kernel.HasComponent(typeof(RestClient)))
         container.Register(Component.For<IRestClient, RestClient>());
+
+      if (!container.Kernel.HasComponent(typeof(ISystemVocabularies)) && !container.Kernel.HasComponent(typeof(SystemVocabularies)))
+        container.Register(Component.For<ISystemVocabularies, SystemVocabularies>());
     }
   }
 }

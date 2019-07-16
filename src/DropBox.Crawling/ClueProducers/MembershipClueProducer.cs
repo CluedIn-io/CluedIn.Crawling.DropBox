@@ -16,19 +16,19 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        protected override Clue MakeClueImpl(GroupMemberInfo value, Guid accountId)
+        protected override Clue MakeClueImpl(GroupMemberInfo input, Guid accountId)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
 
-            var clue = _factory.Create(EntityType.Account, value.Profile.TeamMemberId.ToString(CultureInfo.InvariantCulture), accountId);
+            var clue = _factory.Create(EntityType.Account, input.Profile.TeamMemberId.ToString(CultureInfo.InvariantCulture), accountId);
 
             var data = clue.Data.EntityData;
 
-            if (value.Profile.Name?.DisplayName != null)
+            if (input.Profile.Name?.DisplayName != null)
             {
-                data.Name = value.Profile.Name.DisplayName;
-                data.DisplayName = value.Profile.Name.DisplayName;
+                data.Name = input.Profile.Name.DisplayName;
+                data.DisplayName = input.Profile.Name.DisplayName;
             }
 
             return clue;
