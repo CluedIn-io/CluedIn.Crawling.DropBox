@@ -20,7 +20,7 @@ namespace Crawling.DropBox.Integration.Test
         [Theory]
         [InlineData("/Provider/Root", 1)] 
         [InlineData("/Files/Directory", 2)]
-        [InlineData("/Files/File", 2)]
+        [InlineData("/Files/File", 3)]
         public void CorrectNumberOfEntityTypes(string entityType, int expectedCount)
         {
             var foundCount = _fixture.ClueStorage.CountOfType(entityType);

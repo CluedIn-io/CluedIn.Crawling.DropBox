@@ -12,7 +12,7 @@ namespace CluedIn.Crawling.DropBox.Test.Common
     {
       return new Dictionary<string, object>
             {
-                { DropBoxConstants.KeyName.ApiKey, ConfigurationManager.AppSettings.GetValue(DropBoxConstants.KeyName.ApiKey, "") },
+                //{ DropBoxConstants.KeyName.ApiKey, ConfigurationManager.AppSettings.GetValue(DropBoxConstants.KeyName.ApiKey, "") },
                 { DropBoxConstants.KeyName.Accounts, new AgentToken
                 {
                     AccessToken = ConfigurationManager.AppSettings.GetValue(DropBoxConstants.KeyName.AccessToken, "")

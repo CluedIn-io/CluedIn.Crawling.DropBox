@@ -139,8 +139,8 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
                 {
                     try
                     {
-                        // TODO Implement _client.GetThumbnailAsync
-                        //var thumbnail =  _client.GetThumbnailAsync(value.PathLower, ThumbnailFormat.Jpeg.Instance, ThumbnailSize.W1024h768.Instance).Result;
+                        // TODO Uncomment this once spoke to Kev about DI for DropBoxClient above
+                        //var thumbnail = _client.GetThumbnailAsync(value.PathLower, ThumbnailFormat.Jpeg.Instance, ThumbnailSize.W1024h768.Instance).Result;
 
                         //var bytes = thumbnail.GetContentAsByteArrayAsync().Result;
                         //var rawDataPart = new RawDataPart()

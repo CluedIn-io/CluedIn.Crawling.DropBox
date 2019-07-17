@@ -50,8 +50,8 @@ namespace CluedIn.Provider.DropBox
                 throw new ArgumentNullException(nameof(configuration));
 
             var dropboxCrawlJobData = new DropBoxCrawlJobData(configuration);
-            if (configuration.ContainsKey(DropBoxConstants.KeyName.ApiKey))
-            { dropboxCrawlJobData.ApiKey = configuration[DropBoxConstants.KeyName.ApiKey].ToString(); }
+            if (configuration.ContainsKey(DropBoxConstants.KeyName.ClientId))
+            { dropboxCrawlJobData.ApiKey = configuration[DropBoxConstants.KeyName.ClientId].ToString(); }
 
             return await Task.FromResult(dropboxCrawlJobData);
         }
@@ -114,7 +114,7 @@ namespace CluedIn.Provider.DropBox
             {
                 //TODO add the transformations from specific CrawlJobData object to dictionary
                 // add tests to GetHelperConfigurationBehaviour.cs
-                configuration.Add(DropBoxConstants.KeyName.ApiKey, dropBoxCrawlJobData.ApiKey);
+                configuration.Add(DropBoxConstants.KeyName.ClientId, dropBoxCrawlJobData.ClientId);
 
                 try
                 {
@@ -126,7 +126,7 @@ namespace CluedIn.Provider.DropBox
 
                     appContext.System.Notifications.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
 
-                    var full = await client.ListFolderAsync(string.Empty, false);
+                    var full = await client.ListFolderAsync(string.Empty, UInt32.MaxValue, false);
                     var folderProjection = full.Entries.Where(i => i.IsFolder).Select(item => new FolderProjection() { Id = item.PathLower, Name = item.Name, Parent = string.IsNullOrEmpty(item.PathLower.Remove(item.PathLower.LastIndexOf('/'))) ? "/" : item.PathLower.Remove(item.PathLower.LastIndexOf('/')), Sensitive = ConfigurationManager.AppSettings["Configuration.Sensitive"] != null && ConfigurationManager.AppSettings["Configuration.Sensitive"].Split(',').Contains(item.Name), Permissions = new List<CluedInPermission>(), Active = true }).ToList();
 
                     folderProjection.Add(new FolderProjection() { Id = "/", Name = "Root Folder", Parent = (string)null, Sensitive = false, Permissions = (List<CluedInPermission>)null, Active = true });

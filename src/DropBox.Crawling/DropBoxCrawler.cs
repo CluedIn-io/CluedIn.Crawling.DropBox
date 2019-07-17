@@ -289,7 +289,7 @@ namespace CluedIn.Crawling.DropBox
 
             try
             {
-                var items = client.ListFolderAsync(path: path, includeDeleted: false).Result;
+                var items = client.ListFolderAsync(path: path, limit: UInt32.MaxValue, includeDeleted: false).Result;
 
                 EnumerateFolderItems(options, client, jobData, items, dateTime, list, iterateFolders: true, visitedFolders: visitedFolders);
             }

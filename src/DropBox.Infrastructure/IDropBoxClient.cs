@@ -16,7 +16,7 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
         Task<ListFoldersResult> ListFoldersAsync();
         Task<ListFolderResult> ListFolderContinueAsync(string cursor);
         Task<ListFoldersResult> ListFoldersContinueAsync(string cursor);
-        Task<ListFolderResult> ListFolderAsync(string path, bool includeDeleted = false);
+        Task<ListFolderResult> ListFolderAsync(string path, uint? limit, bool includeDeleted = false);
         Task<ListRevisionsResult> ListRevisionsAsync(string path, ulong limit = 100);
         Task<Metadata> GetMetadataAsync(string path, bool includeMediaInfo = false, bool includeDeleted = false);
         Task<ListFolderGetLatestCursorResult> ListFolderGetLatestCursorAsync(string path, bool recursive = true, bool includeMediaInfo = false);
