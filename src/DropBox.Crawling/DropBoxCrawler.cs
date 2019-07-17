@@ -43,7 +43,14 @@ namespace CluedIn.Crawling.DropBox
 
                 var client = _clientFactory.CreateNew(crawlerJobData);
 
-                var list = new List<object> { client.GetCurrentAccountAsync().Result };
+                var account = client.GetCurrentAccountAsync().Result;
+                if (account == null)
+                {
+                    _log.Error("Settings could not be obtained from DropBox");
+                    return EmptyResult;
+                }
+
+                var list = new List<object> { account };
 
                 GetFolderItemsAsync(CrawlOptions.Recursive, client, crawlerJobData, list);
                 GetSharedFolders(CrawlOptions.Recursive, client, list);
