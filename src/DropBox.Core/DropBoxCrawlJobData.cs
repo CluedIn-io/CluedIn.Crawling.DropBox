@@ -162,7 +162,6 @@ namespace CluedIn.Crawling.DropBox.Core
 
         public long? FileSizeLimit { get; set; }
 
-        public string ApiKey { get; set; }
         public string AdminMemberId { get; set; }
     }
 }

@@ -9,7 +9,6 @@ namespace CluedIn.Crawling.DropBox.Core
     {
         public struct KeyName
         {
-            //public static readonly string ApiKey = nameof(ApiKey);
             public static readonly string BaseUri = nameof(BaseUri);
             public static readonly string AdminMemberId = nameof(AdminMemberId);
             public static readonly string AccessToken = nameof(AccessToken);

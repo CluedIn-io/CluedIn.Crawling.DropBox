@@ -49,7 +49,7 @@ namespace CluedIn.Provider.DropBox
 
             var dropboxCrawlJobData = new DropBoxCrawlJobData(configuration);
             if (configuration.ContainsKey(DropBoxConstants.KeyName.ClientId))
-            { dropboxCrawlJobData.ApiKey = configuration[DropBoxConstants.KeyName.ClientId].ToString(); }
+            { dropboxCrawlJobData.ClientId = configuration[DropBoxConstants.KeyName.ClientId].ToString(); }
 
             return await Task.FromResult(dropboxCrawlJobData);
         }
@@ -110,19 +110,18 @@ namespace CluedIn.Provider.DropBox
 
             if (jobData is DropBoxCrawlJobData dropBoxCrawlJobData)
             {
-                //TODO add the transformations from specific CrawlJobData object to dictionary
-                // add tests to GetHelperConfigurationBehaviour.cs
                 configuration.Add(DropBoxConstants.KeyName.ClientId, dropBoxCrawlJobData.ClientId);
+                configuration.Add(DropBoxConstants.KeyName.ClientSecret, dropBoxCrawlJobData.ClientSecret);
 
                 try
                 {
                     if (dropBoxCrawlJobData.Token == null || string.IsNullOrEmpty(dropBoxCrawlJobData.Token.AccessToken))
                         throw new ApplicationException("The crawl data does not contain an access token");
 
-                    _notifications?.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Authenticating", UserId = userId });
+                    _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Authenticating", UserId = userId });
                     var client = _dropboxClientFactory.CreateNew(dropBoxCrawlJobData);
 
-                    _notifications?.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
+                    _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
 
                     var full = await client.ListFolderAsync(string.Empty, DropBoxConstants.FetchLimit, false);
                     var folderProjection = full.Entries.Where(i => i.IsFolder).Select(item => new FolderProjection() { Id = item.PathLower, Name = item.Name, Parent = string.IsNullOrEmpty(item.PathLower.Remove(item.PathLower.LastIndexOf('/'))) ? "/" : item.PathLower.Remove(item.PathLower.LastIndexOf('/')), Sensitive = ConfigurationManager.AppSettings["Configuration.Sensitive"] != null && ConfigurationManager.AppSettings["Configuration.Sensitive"].Split(',').Contains(item.Name), Permissions = new List<CluedInPermission>(), Active = true }).ToList();
@@ -133,7 +132,7 @@ namespace CluedIn.Provider.DropBox
                     var hasMore = full.HasMore;
                     while (cursor != null && hasMore)
                     {
-                        _notifications?.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
+                        _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
 
                         var fullWithCursor = await client.ListFolderContinueAsync(cursor);
 
@@ -147,7 +146,7 @@ namespace CluedIn.Provider.DropBox
                         hasMore = fullWithCursor.HasMore;
                     }
 
-                    _notifications?.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Shared Folders", UserId = userId });
+                    _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Shared Folders", UserId = userId });
 
                     var responseFromBox = await client.GetFolderListViaRestAsync();
                     if (responseFromBox != null)
@@ -193,7 +192,7 @@ namespace CluedIn.Provider.DropBox
                     //This MUST be called after the previosFolderCount has been assigned
                     CheckForNewConfiguration(context, organizationId, providerDefinitionId, dropBoxCrawlJobData, folderProjection.Count);
 
-                    _notifications?.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Forecasting projected processing time", UserId = userId });
+                    _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Forecasting projected processing time", UserId = userId });
 
                     var usage = await client.GetSpaceUsageAsync();
                     configuration.Add("usage", new Usage() { UsedSpace = (long)usage.Used, NumberOfClues = null, TotalSpace = null });
@@ -285,7 +284,7 @@ namespace CluedIn.Provider.DropBox
                                             Properties = properties
                                         });
 
-                                        context.ApplicationContext.System.Notifications.Publish<NewConfigurationCommand>(
+                                        context.ApplicationContext.System.Notifications.Publish(
                                             new NewConfigurationCommand()
                                             {
                                                 OrganizationId = context.Organization.Id.ToString(),

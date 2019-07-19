@@ -43,8 +43,9 @@ namespace Provider.DropBox.Unit.Test.DropBoxProvider
     // TODO Add test for throws arg exception for incorrect data param
 
 
-    [Theory(Skip = "Should.Core.Exceptions.TrueException : ApiKey not found in results")]
-    [InlineAutoData("ApiKey", "ApiKey", "some-value")]
+    [Theory]
+    [InlineAutoData("Providers.DropBoxClientId", "Providers.DropBoxClientId", "f204fhceqpf0gnk")]
+    [InlineAutoData("Providers.DropBoxClientSecret", "Providers.DropBoxClientSecret", "6iz7w5bslf3c9g9")]
     // TODO add data for other properties that need populating
     // Fill in the values for expected results ....
     public void Returns_Expected_Data(string key, string propertyName, object expectedValue, Guid organizationId, Guid userId, Guid providerDefinitionId) // TODO add additional parameters to populate CrawlJobData instance
