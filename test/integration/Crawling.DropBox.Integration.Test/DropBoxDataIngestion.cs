@@ -14,12 +14,11 @@ namespace Crawling.DropBox.Integration.Test
         {
             _fixture = fixture;
             _output = output;
-            
         }
 
         [Theory]
         [InlineData("/Provider/Root", 1)] 
-        [InlineData("/Files/Directory", 2)]
+        [InlineData("/Files/Directory", 3)]
         [InlineData("/Files/File", 3)]
         public void CorrectNumberOfEntityTypes(string entityType, int expectedCount)
         {

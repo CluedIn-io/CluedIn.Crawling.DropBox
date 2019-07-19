@@ -14,28 +14,26 @@ using CluedIn.Core.Data;
 using CluedIn.Core.DataStore;
 using CluedIn.Core.Logging;
 using CluedIn.Core.Messages.WebApp;
-using CluedIn.Core.Net.Mail;
-using CluedIn.Core.Security;
 using CluedIn.Crawling.DropBox.Core;
 using CluedIn.Crawling.DropBox.Core.Models;
 using CluedIn.Crawling.DropBox.Infrastructure.Factories;
 using CluedIn.Providers.Models;
 using CluedIn.Providers.Webhooks.Models;
-using Dropbox.Api;
-using RestSharp;
 
 namespace CluedIn.Provider.DropBox
 {
     public class DropBoxProvider : ProviderBase
     {
         private readonly IDropBoxClientFactory _dropboxClientFactory;
+        private readonly ISystemNotifications _notifications;
         private readonly ILogger _log;
 
-        public DropBoxProvider([NotNull] ApplicationContext appContext, IDropBoxClientFactory dropboxClientFactory, ILogger log)
+        public DropBoxProvider([NotNull] ApplicationContext appContext, IDropBoxClientFactory dropboxClientFactory, ILogger log, ISystemNotifications notifications)
             : base(appContext, DropBoxConstants.CreateProviderMetadata())
         {
             _dropboxClientFactory = dropboxClientFactory ?? throw new ArgumentNullException(nameof(dropboxClientFactory));
             _log = log ?? throw new ArgumentNullException(nameof(log));
+            _notifications = notifications; // ?? throw new ArgumentNullException(nameof(notifications));
         }
 
 
@@ -121,12 +119,12 @@ namespace CluedIn.Provider.DropBox
                     if (dropBoxCrawlJobData.Token == null || string.IsNullOrEmpty(dropBoxCrawlJobData.Token.AccessToken))
                         throw new ApplicationException("The crawl data does not contain an access token");
 
-                    appContext.System.Notifications.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Authenticating", UserId = userId });
+                    _notifications?.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Authenticating", UserId = userId });
                     var client = _dropboxClientFactory.CreateNew(dropBoxCrawlJobData);
 
-                    appContext.System.Notifications.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
+                    _notifications?.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
 
-                    var full = await client.ListFolderAsync(string.Empty, UInt32.MaxValue, false);
+                    var full = await client.ListFolderAsync(string.Empty, DropBoxConstants.FetchLimit, false);
                     var folderProjection = full.Entries.Where(i => i.IsFolder).Select(item => new FolderProjection() { Id = item.PathLower, Name = item.Name, Parent = string.IsNullOrEmpty(item.PathLower.Remove(item.PathLower.LastIndexOf('/'))) ? "/" : item.PathLower.Remove(item.PathLower.LastIndexOf('/')), Sensitive = ConfigurationManager.AppSettings["Configuration.Sensitive"] != null && ConfigurationManager.AppSettings["Configuration.Sensitive"].Split(',').Contains(item.Name), Permissions = new List<CluedInPermission>(), Active = true }).ToList();
 
                     folderProjection.Add(new FolderProjection() { Id = "/", Name = "Root Folder", Parent = (string)null, Sensitive = false, Permissions = (List<CluedInPermission>)null, Active = true });
@@ -135,7 +133,7 @@ namespace CluedIn.Provider.DropBox
                     var hasMore = full.HasMore;
                     while (cursor != null && hasMore)
                     {
-                        appContext.System.Notifications.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
+                        _notifications?.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
 
                         var fullWithCursor = await client.ListFolderContinueAsync(cursor);
 
@@ -149,7 +147,7 @@ namespace CluedIn.Provider.DropBox
                         hasMore = fullWithCursor.HasMore;
                     }
 
-                    appContext.System.Notifications.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Shared Folders", UserId = userId });
+                    _notifications?.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Shared Folders", UserId = userId });
 
                     var responseFromBox = await client.GetFolderListViaRestAsync();
                     if (responseFromBox != null)
@@ -195,12 +193,12 @@ namespace CluedIn.Provider.DropBox
                     //This MUST be called after the previosFolderCount has been assigned
                     CheckForNewConfiguration(context, organizationId, providerDefinitionId, dropBoxCrawlJobData, folderProjection.Count);
 
-                    appContext.System.Notifications.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Forecasting projected processing time", UserId = userId });
+                    _notifications?.Publish<ProviderMessageCommand>(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Forecasting projected processing time", UserId = userId });
 
                     var usage = await client.GetSpaceUsageAsync();
                     configuration.Add("usage", new Usage() { UsedSpace = (long)usage.Used, NumberOfClues = null, TotalSpace = null });
 
-                    dropBoxCrawlJobData.ExpectedStatistics.EntityTypeStatistics.Add(new EntityTypeStatistics(EntityType.Files.Directory, folderProjection.Count, 0));
+                    dropBoxCrawlJobData.ExpectedStatistics?.EntityTypeStatistics?.Add(new EntityTypeStatistics(EntityType.Files.Directory, folderProjection.Count, 0));
                     configuration.Add("expectedStatistics", dropBoxCrawlJobData.ExpectedStatistics);
 
                 }

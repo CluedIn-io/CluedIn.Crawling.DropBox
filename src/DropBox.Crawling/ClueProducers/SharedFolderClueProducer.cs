@@ -32,6 +32,8 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
 
             var clue = _factory.Create(EntityType.Files.Directory, input.SharedFolderId.ToString(CultureInfo.InvariantCulture), accountId);
 
+            clue.ValidationRuleSuppressions.Add(Constants.Validation.Rules.METADATA_002_Uri_MustBeSet);
+
             var data = clue.Data.EntityData;
 
             if (input.Name != null)

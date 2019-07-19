@@ -23,6 +23,8 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
         private readonly DropboxClient _dropBoxClient;
         private readonly ILogger _log;
 
+        // TODO Create parameterless constructor, make privates as properties of interface so we can mock this class
+
         public DropBoxClient(ILogger log, DropBoxCrawlJobData dropBoxCrawlJobData, IRestClient restClient) 
         {
             _log = log ?? throw new ArgumentNullException(nameof(log));
@@ -94,6 +96,9 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
             {
                 {"Content-Type", "application/json" }}
             );
+
+        public async Task<IDownloadResponse<FileMetadata>> DownloadAsync(string path, string revision) =>
+            await _dropBoxClient.Files.DownloadAsync(path, revision);
 
         private async Task<T> PostAsync<T>(string url, object body, IDictionary<string, string> headers = null, IList<QueryStringParameter> parameters = null)
         {

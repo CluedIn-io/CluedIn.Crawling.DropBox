@@ -23,5 +23,6 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
         Task<IDownloadResponse<FileMetadata>> GetThumbnailAsync(string path, ThumbnailFormat format = null, ThumbnailSize size = null, ThumbnailMode mode = null);
         Task<FolderList> GetFolderListViaRestAsync();
         Task<Permissions> GetFolderPermissions(Entry folder, int limit = 10);
+        Task<IDownloadResponse<FileMetadata>> DownloadAsync(string path, string revision);
     }
 }

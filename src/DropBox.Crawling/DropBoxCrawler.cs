@@ -55,6 +55,10 @@ namespace CluedIn.Crawling.DropBox
                 GetFolderItemsAsync(CrawlOptions.Recursive, client, crawlerJobData, list);
                 GetSharedFolders(CrawlOptions.Recursive, client, list);
 
+                // Index files
+
+                // Get thumbnails
+
                 return list;
             }
             catch (AggregateException e)
@@ -296,7 +300,7 @@ namespace CluedIn.Crawling.DropBox
 
             try
             {
-                var items = client.ListFolderAsync(path: path, limit: UInt32.MaxValue, includeDeleted: false).Result;
+                var items = client.ListFolderAsync(path: path, limit:DropBoxConstants.FetchLimit, includeDeleted: false).Result;
 
                 EnumerateFolderItems(options, client, jobData, items, dateTime, list, iterateFolders: true, visitedFolders: visitedFolders);
             }
