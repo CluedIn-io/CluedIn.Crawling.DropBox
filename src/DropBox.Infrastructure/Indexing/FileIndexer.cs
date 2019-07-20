@@ -29,19 +29,29 @@ namespace CluedIn.Crawling.DropBox.Infrastructure.Indexing
         public async Task Index(Metadata file, Clue clue)
         {
             if (file == null)
+            {
                 throw new ArgumentNullException(nameof(file));
+            }
 
             if (clue == null)
+            {
                 throw new ArgumentNullException(nameof(clue));
+            }
 
             if (file.AsFile.Size == 0)
+            {
                 return;
+            }
 
             if (!ConfigurationManager.AppSettings.GetFlag("Crawl.InitialCrawl.FileIndexing", true))
+            {
                 return;
+            }
 
             if ((long)file.AsFile.Size > Constants.MaxFileIndexingFileSize)
+            {
                 return;
+            }
 
             var f = await _client.DownloadAsync(file.PathLower, file.AsFile.Rev);
 

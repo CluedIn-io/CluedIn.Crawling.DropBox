@@ -30,7 +30,7 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
             _log = log ?? throw new ArgumentNullException(nameof(log));
             _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
 
-            _restClient.BaseUrl = string.IsNullOrEmpty(dropBoxCrawlJobData.BaseUri) ? new Uri(DropBoxConstants.ApiUri) : new Uri(dropBoxCrawlJobData.BaseUri);
+            _restClient.BaseUrl = new Uri(DropBoxConstants.ApiUri);
            //_restClient.AddDefaultParameter("api_key", dropBoxCrawlJobData.ClientId, ParameterType.QueryString);
             _restClient.AddDefaultHeader("Authorization", "Bearer " + dropBoxCrawlJobData.Token.AccessToken);
             //_restClient.AddDefaultHeader("API-Select-Admin", dropBoxCrawlJobData.AdminMemberId); // TODO confirm we want to access as admin in DropBox Business accounts (see https://www.dropbox.com/developers/documentation/http/teams)
@@ -89,7 +89,7 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
             await _dropBoxClient.Files.GetThumbnailAsync(path, format, size, mode);
 
         public async Task<FolderList> GetFolderListViaRestAsync() =>
-            await PostAsync<FolderList>("/sharing/list_folders", null);
+            await PostAsync<FolderList>("sharing/list_folders", null);
 
         public async Task<Permissions> GetFolderPermissions(Entry folder, int limit = 10) =>
             await PostAsync<Permissions>("sharing/list_folder_members", new MemberPost {shared_folder_id = folder.shared_folder_id, limit = limit}, new Dictionary<string, string>
@@ -133,9 +133,13 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
                     var flat = ex.Flatten();
 
                     if (flat.InnerExceptions.Count == 1 && flat.InnerExceptions[0] is RateLimitException rateEx)
+                    {
                         await Task.Delay(TimeSpan.FromSeconds(rateEx.RetryAfter)); //, _state.CancellationTokenSource.Token);  // TODO Find out how to access state
+                    }
                     else
+                    {
                         throw;
+                    }
                 }
                 catch (RateLimitException ex)
                 {

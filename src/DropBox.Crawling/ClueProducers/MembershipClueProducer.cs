@@ -19,7 +19,9 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
         protected override Clue MakeClueImpl(GroupMemberInfo input, Guid accountId)
         {
             if (input == null)
+            {
                 throw new ArgumentNullException(nameof(input));
+            }
 
             var clue = _factory.Create(EntityType.Account, input.Profile.TeamMemberId.ToString(CultureInfo.InvariantCulture), accountId);
 

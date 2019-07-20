@@ -22,13 +22,17 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             _log = log ?? throw new ArgumentNullException(nameof(log));
 
             if (factory is DropBoxClueFactory dropBoxClueFactory)
+            {
                 _providerRoot = dropBoxClueFactory.ProviderRoot; // TODO think of better way of doing referencing the base provider clue
+            }
         }
 
         protected override Clue MakeClueImpl(SharedFolderMetadata input, Guid accountId)
         {
             if (input == null)
+            {
                 throw new ArgumentNullException(nameof(input));
+            }
 
             var clue = _factory.Create(EntityType.Files.Directory, input.SharedFolderId.ToString(CultureInfo.InvariantCulture), accountId);
 
@@ -56,7 +60,9 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             }
 
             if (input.PathLower != null)
+            {
                 data.Properties[DropBoxVocabulary.SharedFolder.FolderPath] = input.PathLower;
+            }
 
             _factory.CreateOutgoingEntityReference(clue, EntityType.Provider.Root, EntityEdgeType.ManagedIn, _providerRoot, _providerRoot.OriginEntityCode.Value);
 

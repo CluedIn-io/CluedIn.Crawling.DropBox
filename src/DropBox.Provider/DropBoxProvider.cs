@@ -14,6 +14,7 @@ using CluedIn.Core.Data;
 using CluedIn.Core.DataStore;
 using CluedIn.Core.Logging;
 using CluedIn.Core.Messages.WebApp;
+using CluedIn.Core.Security;
 using CluedIn.Crawling.DropBox.Core;
 using CluedIn.Crawling.DropBox.Core.Models;
 using CluedIn.Crawling.DropBox.Infrastructure.Factories;
@@ -44,14 +45,171 @@ namespace CluedIn.Provider.DropBox
             Guid userId,
             Guid providerDefinitionId)
         {
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
+            {
+                var dropBoxProviderId = Id;
+                var tokenStore = context.Organization.DataStores.GetDataStore<Token>();
 
-            var dropboxCrawlJobData = new DropBoxCrawlJobData(configuration);
-            if (configuration.ContainsKey(DropBoxConstants.KeyName.ClientId))
-            { dropboxCrawlJobData.ClientId = configuration[DropBoxConstants.KeyName.ClientId].ToString(); }
+                if (tokenStore == null)
+                {
+                    return new CrawlJobData() { Errors = new Dictionary<string, string>() { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
+                }
 
-            return await Task.FromResult(dropboxCrawlJobData);
+                var accounts = await tokenStore.SelectAsync(context, account => account.ProviderId == dropBoxProviderId && account.OrganizationId == organizationId && account.UserId == userId && account.ConfigurationId == providerDefinitionId);
+                if (!accounts.Any())
+                {
+                    // TODO: I should not be able to have more than one provider per user per organization
+                    accounts = await tokenStore.SelectAsync(context, account => account.ProviderId == dropBoxProviderId && account.OrganizationId == organizationId && account.UserId == userId && account.ConfigurationId == null);
+
+                    //You have more than one token that could authenticate with this
+                    if (accounts.Count() > 1)
+                    {
+                        context.Log.Warn(() => "While binding a token to a provider, there was more than one token that wouls viable and we chose the first.");
+                    }
+
+                    if (accounts.Count() == 1)
+                    {
+                        if (accounts.First().ConfigurationId == null)
+                        {
+                            accounts.First().ConfigurationId = providerDefinitionId;
+                            tokenStore.Update(context, accounts.First());
+                        }
+                    }
+                }
+
+                //Add Authetnication for all Accounts here
+                var agentToken = accounts.Select(i => new AgentToken() { AccessToken = i.AccessToken, RefreshToken = i.RefreshToken, ExpiresIn = i.ExpiresIn }).FirstOrDefault();
+                if (agentToken == null)
+                {
+                    return new CrawlJobData() { Errors = new Dictionary<string, string>() { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
+                }
+
+                if (!configuration.ContainsKey("baseUri"))
+                {
+                    configuration.Add("baseUri", "https://www.dropbox.com/home/");
+                }
+
+                if (!configuration.ContainsKey("Providers.DropBoxClientId"))
+                {
+                    configuration.Add("Providers.DropBoxClientId", ConfigurationManager.AppSettings["Providers.DropBoxClientId"]);
+                }
+
+                if (!configuration.ContainsKey("Providers.DropBoxClientSecret"))
+                {
+                    configuration.Add("Providers.DropBoxClientSecret", ConfigurationManager.AppSettings["Providers.DropBoxClientSecret"]);
+                }
+
+                if (!configuration.ContainsKey("Accounts"))
+                {
+                    configuration.Add("Accounts", agentToken);
+                }
+
+                // TODO: This seems like it should be in the providers project and not the crawler.
+                var jobData = new DropBoxCrawlJobData(configuration);
+
+                var client = _dropboxClientFactory.CreateNew(jobData);
+
+                if (jobData.LastestCursors == null || !jobData.LastestCursors.ContainsKey("Files"))
+                {
+                    // HACK: Populate latest cursor if none is set
+                    try
+                    {
+                        jobData.LastestCursors = jobData.LastestCursors ?? new Dictionary<string, string>();
+
+                        var cursor = await client.ListFolderGetLatestCursorAsync(string.Empty, recursive: true, includeMediaInfo: false).ConfigureAwait(false);
+
+                        if (cursor != null)
+                        {
+                            jobData.LastestCursors["Files"] = cursor.Cursor;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        context.Log.Error(() => "Failed to get latest cursor Dropbox", ex);
+                    }
+                }
+
+                try
+                {
+                    var entityTypeStatistics = new ExpectedStatistics();
+                    entityTypeStatistics.EntityTypeStatistics.Add(new EntityTypeStatistics(EntityType.Files.File, 0, 0));
+                    entityTypeStatistics.EntityTypeStatistics.Add(new EntityTypeStatistics(EntityType.Person, 0, 0));
+                    entityTypeStatistics.EntityTypeStatistics.Add(new EntityTypeStatistics(EntityType.Infrastructure.Group, 0, 0));
+                    entityTypeStatistics.EntityTypeStatistics.Add(new EntityTypeStatistics(EntityType.Documents.Document, 0, 0));
+                    entityTypeStatistics.EntityTypeStatistics.Add(new EntityTypeStatistics(EntityType.Documents.Presentation, 0, 0));
+                    entityTypeStatistics.EntityTypeStatistics.Add(new EntityTypeStatistics(EntityType.Documents.Spreadsheet, 0, 0));
+  
+                    jobData.ExpectedStatistics = entityTypeStatistics;
+                    jobData.ExpectedData = 0;// accountInformation.quota_info.quota;
+                    jobData.ExpectedTime = new TimeSpan(0, 0, 0); //Maybe use the last run time from the agent statistics
+                 
+
+                }
+                catch (Exception ex)
+                {
+                    context.Log.Error(() => "Failed to refresh the access token for Dropbox", ex);
+                    context.Organization.Providers.SetProviderDefinitionAuthenticationError(context, providerDefinitionId, ex);
+                }
+
+                //No need to look for a refresh token as it will only stop working if the person uninstalls the app. https://www.dropbox.com/developers/reference/oauthguide
+                if (!jobData.IsAuthenticated)
+                {
+                    return new CrawlJobData() { Errors = new Dictionary<string, string>() { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
+                }
+
+                if (ConfigurationManager.AppSettings.GetFlag("Feature.Webhooks.Enabled", false) && SupportsWebHooks)
+                {
+                    var organizationProviderDataStore = context.Organization.DataStores.GetDataStore<ProviderDefinition>();
+                    if (organizationProviderDataStore != null)
+                    {
+                        var webhookEnabled = organizationProviderDataStore.GetById(context, providerDefinitionId);
+                        if (webhookEnabled != null)
+                        {
+                            if (webhookEnabled.WebHooks != null)
+                            {
+                                if (webhookEnabled.WebHooks.Value == false)
+                                {
+                                    var webhookDefinition = WebHookDefinitionBuilder.CreateWebhookDefinition(webhookEnabled);
+                                    var results = await CreateWebHook(context, jobData, webhookDefinition, configuration);
+                                    foreach (var result in results)
+                                    {
+                                        webhookDefinition.Signature = result.Signature;
+                                        webhookDefinition.ExternalVersion = result.ExternalVersion;
+                                        webhookDefinition.ExternalId = result.ExternalId;
+
+                                        var webhookDefinitionDataStore = context.Organization.DataStores.GetDataStore<WebhookDefinition>();
+                                        if (webhookDefinitionDataStore != null)
+                                        {
+                                            webhookDefinitionDataStore.Insert(context, webhookDefinition);
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                var webhookDefinition = WebHookDefinitionBuilder.CreateWebhookDefinition(webhookEnabled);
+                                var results = await CreateWebHook(context, jobData, webhookDefinition, configuration);
+                                foreach (var result in results)
+                                {
+                                    webhookDefinition.Signature = result.Signature;
+                                    webhookDefinition.ExternalVersion = result.ExternalVersion;
+                                    webhookDefinition.ExternalId = result.ExternalId;
+
+                                    var webhookDefinitionDataStore = context.Organization.DataStores.GetDataStore<WebhookDefinition>();
+                                    if (webhookDefinitionDataStore != null)
+                                    {
+                                        webhookDefinitionDataStore.Insert(context, webhookDefinition);
+                                    }
+                                }
+                            }
+
+                            webhookEnabled.WebHooks = true;
+                            organizationProviderDataStore.Update(context, webhookEnabled);
+                        }
+                    }
+                }
+
+                return jobData;
+            }
         }
 
         public override async Task<bool> TestAuthentication(
@@ -65,7 +223,9 @@ namespace CluedIn.Provider.DropBox
             try
             {
                 if (dropBoxCrawlJobData.Token == null || string.IsNullOrEmpty(dropBoxCrawlJobData.Token.AccessToken))
+                {
                     return false;
+                }
 
                 var client = _dropboxClientFactory.CreateNew(dropBoxCrawlJobData);
 
@@ -104,7 +264,9 @@ namespace CluedIn.Provider.DropBox
             string folderId)
         {
             if (jobData == null)
+            {
                 throw new ArgumentNullException(nameof(jobData));
+            }
 
             var configuration = new Dictionary<string, object>();
 
@@ -116,7 +278,9 @@ namespace CluedIn.Provider.DropBox
                 try
                 {
                     if (dropBoxCrawlJobData.Token == null || string.IsNullOrEmpty(dropBoxCrawlJobData.Token.AccessToken))
+                    {
                         throw new ApplicationException("The crawl data does not contain an access token");
+                    }
 
                     _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Authenticating", UserId = userId });
                     var client = _dropboxClientFactory.CreateNew(dropBoxCrawlJobData);
@@ -139,7 +303,9 @@ namespace CluedIn.Provider.DropBox
                         foreach (var fol in fullWithCursor.Entries.Where(i => i.IsFolder))
                         {
                             if (!folderProjection.Select(d => d.Id).Contains(fol.PathLower))
+                            {
                                 folderProjection.Add(new FolderProjection() { Id = fol.PathLower, Name = fol.Name, Parent = string.IsNullOrEmpty(fol.PathLower.Remove(fol.PathLower.LastIndexOf('/'))) ? "/" : fol.PathLower.Remove(fol.PathLower.LastIndexOf('/')), Sensitive = ConfigurationManager.AppSettings["Configuration.Sensitive"] != null && ConfigurationManager.AppSettings["Configuration.Sensitive"].Split(',').Contains(fol.Name), Permissions = new List<CluedInPermission>(), Active = true });
+                            }
                         }
 
                         cursor = fullWithCursor.Cursor;
@@ -157,8 +323,12 @@ namespace CluedIn.Provider.DropBox
                             if (responseFromBox1 != null)
                             {
                                 if (sharedFolder.path_lower != null)
+                                {
                                     if (!folderProjection.Select(d => d.Id).Contains(sharedFolder.path_lower))
+                                    {
                                         folderProjection.Add(new FolderProjection() { Id = sharedFolder.path_lower, Name = sharedFolder.name, Parent = "/", Sensitive = false, Permissions = responseFromBox1.groups.Select(s => new CluedInPermission() { }).Concat(responseFromBox1.invitees.Select(s => new CluedInPermission() { })).Concat(responseFromBox1.users.Select(s => new CluedInPermission() { })).ToList(), Active = true });
+                                    }
+                                }
                             }
                         }
                     }
@@ -214,7 +384,9 @@ namespace CluedIn.Provider.DropBox
         public override async Task<AccountInformation> GetAccountInformation(ExecutionContext context, [NotNull] CrawlJobData jobData, Guid organizationId, Guid userId, Guid providerDefinitionId)
         {
             if (jobData == null)
+            {
                 throw new ArgumentNullException(nameof(jobData));
+            }
 
             var crawlJobData = (DropBoxCrawlJobData)jobData;
 
@@ -237,7 +409,9 @@ namespace CluedIn.Provider.DropBox
                         var configurationDataStore = appContext.Container.Resolve<IConfigurationRepository>();
                         var configuration = configurationDataStore.GetConfigurationById(context, providerDefinitionId);
                         if (configuration == null)
+                        {
                             return;
+                        }
 
                         var currentlySelectedProjectId = projectFoldersCount;
                         if (configuration.ContainsKey("previousfolderProjectionCount"))
@@ -317,11 +491,19 @@ namespace CluedIn.Provider.DropBox
         public override async Task<IEnumerable<WebHookSignature>> CreateWebHook(ExecutionContext context, [NotNull] CrawlJobData jobData, [NotNull] IWebhookDefinition webhookDefinition, [NotNull] IDictionary<string, object> config)
         {
             if (jobData == null)
+            {
                 throw new ArgumentNullException(nameof(jobData));
+            }
+
             if (webhookDefinition == null)
+            {
                 throw new ArgumentNullException(nameof(webhookDefinition));
+            }
+
             if (config == null)
+            {
                 throw new ArgumentNullException(nameof(config));
+            }
 
             return await Task.Run(() =>
             {
@@ -363,9 +545,14 @@ namespace CluedIn.Provider.DropBox
         public override async Task DeleteWebHook(ExecutionContext context, [NotNull] CrawlJobData jobData, [NotNull] IWebhookDefinition webhookDefinition)
         {
             if (jobData == null)
+            {
                 throw new ArgumentNullException(nameof(jobData));
+            }
+
             if (webhookDefinition == null)
+            {
                 throw new ArgumentNullException(nameof(webhookDefinition));
+            }
 
             await Task.Run(() =>
             {

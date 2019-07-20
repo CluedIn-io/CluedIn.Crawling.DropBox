@@ -34,7 +34,9 @@ namespace CluedIn.Provider.DropBox.WebHooks
             try
             {
                 if (ConfigurationManager.AppSettings.GetFlag("Feature.Webhooks.Log.Posts", false))
+                {
                     context.Log.Debug(() => command.HttpPostData);
+                }
 
                 var configurationDataStore = context.ApplicationContext.Container.Resolve<IConfigurationRepository>();
                 if (command.WebhookDefinition.ProviderDefinitionId != null)
@@ -45,8 +47,12 @@ namespace CluedIn.Provider.DropBox.WebHooks
 
                     // If you have stopped the provider then don't process the webhooks
                     if (providerDefinition?.WebHooks != null)
+                    {
                         if (providerDefinition.WebHooks == false || providerDefinition.IsEnabled == false)
+                        {
                             return new List<Clue>();
+                        }
+                    }
 
                     if (jobDataCheck != null)
                     {

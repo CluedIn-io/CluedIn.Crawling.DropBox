@@ -18,7 +18,9 @@ namespace CluedIn.Crawling.DropBox.Infrastructure.UriBuilders
         public Uri GetUri([NotNull] Metadata item)
         {
             if (item == null)
+            {
                 throw new ArgumentNullException(nameof(item));
+            }
 
             return new UriBuilder(_baseUri)
             {

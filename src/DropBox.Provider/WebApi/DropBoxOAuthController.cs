@@ -18,7 +18,7 @@ using java.sql;
 
 namespace CluedIn.Provider.DropBox.WebApi
 {
-    [RoutePrefix("api/" + DropBoxConstants.ProviderName + "/oauth")]
+    [RoutePrefix("api/" + DropBoxConstants.ProviderName + "oauth")]
     public class DropBoxOAuthController : OAuthCluedInApiController, IOAuth2Authentication
     {
         private const string NoStateFoundInCluedin = "No state found in CluedIn";
@@ -28,32 +28,43 @@ namespace CluedIn.Provider.DropBox.WebApi
         public DropBoxOAuthController([NotNull] DropBoxProviderComponent component)
         : base(component)
         {
-            
+
         }
 
         // This method will be invoked as a call-back from an authentication service (e.g., https://login.windows.net/).
         // It is not intended to be called directly, only as a redirect from the authorization request.
         // On completion, the method will cache the refresh token and access tokens, and redirect to the URL
         // specified in the state parameter.
-        public async Task<HttpResponseMessage> Get(string code, string state)       // TODO async here is not being awaited anywhere...
+        [HttpGet]
+        public async Task<HttpResponseMessage> Get(string code, string state)
         {
+            // TODO call to CreateRequestSystemExecutionContext is using the system organization, NOT that of the calling app (ie foobar)
             using (var context = CreateRequestSystemExecutionContext())
             {
                 // NOTE: In production, OAuth must be done over a secure HTTPS connection.
                 if (Request.RequestUri.Scheme != "https" && !Request.RequestUri.IsLoopback)
+                {
                     return await Task.FromResult(Get("Endpoint is not HTTPS"));
+                }
 
                 // Ensure there is a state value on the response.  If there is none, stop OAuth processing and display an error.
                 if (state == null)
+                {
                     return await Task.FromResult(Get(NoStateWasReturnedFromAuthenticator));
+                }
 
                 if (code == null)
+                {
                     return await Task.FromResult(Get("No code was returned from authenticator"));
+                }
 
                 var clientId = ConfigurationManager.AppSettings.GetValue("Providers.DropBoxClientId", (string)null);
                 var clientSecret = ConfigurationManager.AppSettings.GetValue("Providers.DropBoxClientSecret", (string)null);
 
-                if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret)) throw new Exception("Could not get DropBox ClientId or ClientSecret");
+                if (string.IsNullOrWhiteSpace(clientId) || string.IsNullOrWhiteSpace(clientSecret))
+                {
+                    throw new Exception("Could not get DropBox ClientId or ClientSecret");
+                }
 
                 var stateObject = ValidateState(context, state);
 
@@ -74,7 +85,9 @@ namespace CluedIn.Provider.DropBox.WebApi
                 {
                     var tokenStore = context.Organization.DataStores.GetDataStore<Token>();
                     if (tokenStore == null)
+                    {
                         return Get("Could not access token store");
+                    }
 
                     var dropBoxProviderId = DropBoxConstants.ProviderId;
 
@@ -133,7 +146,7 @@ namespace CluedIn.Provider.DropBox.WebApi
                         }
                     }
 
-                    bool reAuthenticated = false;
+                    var reAuthenticated = false;
                     //Check if you are just needing to re-authenticate
                     var reAuthenticateCheck = tokenStore.Select(context, t => t.ProviderId == dropBoxProviderId && t.AccountId == accountId && t.UserId == stateObject.UserId).ToList();
 
@@ -204,6 +217,7 @@ namespace CluedIn.Provider.DropBox.WebApi
                     return response;
                 }
             }
+
         }
 
         /// <summary>Gets the specified error.</summary>
@@ -212,10 +226,12 @@ namespace CluedIn.Provider.DropBox.WebApi
         public HttpResponseMessage Get([NotNull] string error)   // TODO could this method be renamed to GetErrorResponse
         {
             if (error == null)
+            {
                 throw new ArgumentNullException(nameof(error));
+            }
 
             var response = Request.CreateResponse(HttpStatusCode.ExpectationFailed);
-            using (var context = this.CreateRequestSystemExecutionContext())
+            using (var context = CreateRequestSystemExecutionContext())
             {
                 context.Log.Warn(() => $"DropBox received an error on OAuth : {error}");
             }

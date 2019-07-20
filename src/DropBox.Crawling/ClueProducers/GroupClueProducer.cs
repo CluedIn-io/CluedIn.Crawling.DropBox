@@ -20,7 +20,9 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
         protected override Clue MakeClueImpl(GroupFullInfo input, Guid accountId)
         {
             if (input == null)
+            {
                 throw new ArgumentNullException(nameof(input));
+            }
 
             var clue = _factory.Create(EntityType.Infrastructure.Group, input.GroupId.ToString(CultureInfo.InvariantCulture), accountId);
 
@@ -33,7 +35,9 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             }
 
             if (input.MemberCount != null)
+            {
                 data.Properties[DropBoxVocabulary.Group.MemberCount] = input.MemberCount.Value.ToString(CultureInfo.InvariantCulture);
+            }
 
             return clue;
         }

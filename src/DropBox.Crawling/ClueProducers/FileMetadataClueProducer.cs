@@ -45,18 +45,26 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             _context = context;
 
             if (state.JobData is DropBoxCrawlJobData jobData)
+            {
                 _jobData = jobData;
+            }
             else
+            {
                 throw new ArgumentException("state parameter must have JobData of type DropBoxCrawlJobData");
-       
+            }
+
             if (factory is DropBoxClueFactory dropBoxClueFactory)
+            {
                 _providerRoot = dropBoxClueFactory.ProviderRoot; // TODO think of better way of doing referencing the base provider clue
+            }
         }
 
         protected override Clue MakeClueImpl([NotNull] FileMetadata input, Guid accountId)
         {
             if (input == null)
+            {
                 throw new ArgumentNullException(nameof(input));
+            }
 
             var clue = _factory.Create(EntityType.Files.File, input.PathLower, accountId);
             clue.ValidationRuleSuppressions.Add(Constants.Validation.Rules.DATA_001_File_MustBeIndexed);

@@ -13,7 +13,9 @@ namespace CluedIn.Crawling.DropBox.Core
         public DropBoxCrawlJobData(IDictionary<string, object> configuration)
         {
             if (configuration == null)
+            {
                 return;
+            }
 
             IsAuthenticated = true;
 
@@ -99,7 +101,9 @@ namespace CluedIn.Crawling.DropBox.Core
             BaseUri = GetValue<string>(configuration, DropBoxConstants.KeyName.BaseUri);
             AdminMemberId = GetValue<string>(configuration, DropBoxConstants.KeyName.AdminMemberId);
             if (LastestCursors == null)
+            {
                 LastestCursors = new Dictionary<string, string>();
+            }
             else
             {
                 LastestCursors = configuration.ContainsKey(DropBoxConstants.KeyName.LastCursor)

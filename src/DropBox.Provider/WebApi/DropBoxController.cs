@@ -20,6 +20,7 @@ namespace CluedIn.Provider.DropBox.WebApi
         {
         }
 
+
         // GET: Authenticate and Fetch Data
         public async Task<HttpResponseMessage> Get(string authError)
         {
@@ -28,7 +29,7 @@ namespace CluedIn.Provider.DropBox.WebApi
                 if (authError != null)  // TODO is an OK response acceptable if authError == null ?
                 {
                     // Tell the OAuth provider where to redirect to once you have the code.
-                    var redirectUri = new Uri(Request.RequestUri.GetLeftPart(UriPartial.Authority) + "/api/" + DropBoxConstants.ProviderName + "/oauth");
+                    var redirectUri = new Uri(Request.RequestUri.GetLeftPart(UriPartial.Authority) + "/api/" + DropBoxConstants.ProviderName + "oauth");
 
                     var state = GenerateState(context, UserPrincipal.Identity.UserId, redirectUri.AbsoluteUri, context.Organization.Id);
 

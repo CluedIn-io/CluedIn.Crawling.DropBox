@@ -18,8 +18,9 @@ namespace CluedIn.Crawling.DropBox.Factories
         protected override Clue ConfigureProviderRoot([NotNull] Clue clue)
         {
             if (clue == null)
+            {
                 throw new ArgumentNullException(nameof(clue));
-
+            }
 
             clue.ValidationRuleSuppressions.Add(Constants.Validation.Rules.PROPERTIES_001_MustExist);
             

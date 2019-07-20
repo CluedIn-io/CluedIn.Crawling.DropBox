@@ -61,7 +61,9 @@ namespace CluedIn.Provider.DropBox
         public override void Stop()
         {
             if (State == ServiceState.Stopped)
+            {
                 return;
+            }
 
             State = ServiceState.Stopped;
         }

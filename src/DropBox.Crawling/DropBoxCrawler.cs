@@ -88,11 +88,15 @@ namespace CluedIn.Crawling.DropBox
                     var folders = (jobData.Folders?.Select(sp => sp.EntryPoint) ?? new string[] { }).ToHashSet();
 
                     if (!folders.Any() || folders.Contains("/") || folders.Contains(string.Empty))
+                    {
                         GetFolderItemsAsync(options, client, jobData,"/", new HashSet<string>(), list);
+                    }
                     else
                     {
                         foreach (var path in folders)
+                        {
                             GetFolderItemsAsync(options, client, jobData, path, new HashSet<string>(), list);
+                        }
                     }
                 }
 
@@ -144,7 +148,9 @@ namespace CluedIn.Crawling.DropBox
             //    return EmptyResult;
 
             if (string.IsNullOrEmpty(cursor))
+            {
                 return;
+            }
 
             var dateTime = GetModifiedLastCrawlFinishTime(jobData);
 
@@ -175,8 +181,9 @@ namespace CluedIn.Crawling.DropBox
                 var sharedFolders = client.ListFoldersAsync().Result;
 
                 if (sharedFolders == null)
+                {
                     return;
-
+                }
 
                 do
                 {
@@ -189,9 +196,13 @@ namespace CluedIn.Crawling.DropBox
                     }
 
                     if (!string.IsNullOrEmpty(sharedFolders.Cursor))
+                    {
                         sharedFolders = client.ListFoldersContinueAsync(sharedFolders.Cursor).Result;
+                    }
                     else
+                    {
                         break;
+                    }
                 } while (sharedFolders != null); // && !_state.CancellationTokenSource.IsCancellationRequested); TODO find out how to access state
             }
             catch (OperationCanceledException)
@@ -247,7 +258,9 @@ namespace CluedIn.Crawling.DropBox
                             list.Add(folder);
 
                             if (iterateFolders)
+                            {
                                 GetFolderItemsAsync(options, client, jobData, folder.PathLower, visitedFolders, list);
+                            }
                         }
                     }
 
@@ -276,7 +289,9 @@ namespace CluedIn.Crawling.DropBox
             path = path?.Trim() ?? string.Empty;
 
             if (path == "/")
+            {
                 path = string.Empty;
+            }
 
             return path;
         }
@@ -291,7 +306,9 @@ namespace CluedIn.Crawling.DropBox
             if (visitedFolders != null)
             {
                 if (visitedFolders.Contains(path))
+                {
                     return;
+                }
 
                 visitedFolders.Add(path);
             }
@@ -330,7 +347,9 @@ namespace CluedIn.Crawling.DropBox
                         //    return default(Metadata);
 
                         if (version.ServerModified < dateTime)
+                        {
                             continue;
+                        }
 
                         return version;
                     }
@@ -378,7 +397,9 @@ namespace CluedIn.Crawling.DropBox
         {
             var dateTime = jobData.LastCrawlFinishTime;
             if (dateTime > DateTimeOffset.MinValue)
+            {
                 dateTime = dateTime.AddDays(-2);
+            }
 
             return dateTime;
         }

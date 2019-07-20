@@ -20,7 +20,9 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
         protected override Clue MakeClueImpl(FullAccount input, Guid accountId)
         {
             if (input == null)
+            {
                 throw new ArgumentNullException(nameof(input));
+            }
 
             var clue = _factory.Create(EntityType.Infrastructure.User, input.AccountId, accountId);
 
@@ -49,7 +51,9 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
 
 
             if (! string.IsNullOrEmpty(input.Team?.Name))
+            {
                 data.Properties[DropBoxVocabulary.AccountInfo.TeamName] = input.Team.Name;
+            }
 
             return clue;
         }
