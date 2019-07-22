@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using CluedIn.Core.Agent.Jobs;
 using CluedIn.Core.Crawling;
 using CluedIn.Core.Providers;
 using CluedIn.Crawling;
@@ -23,7 +24,7 @@ namespace Crawling.DropBox.Unit.Test
             public void ConstructorRequiresClientFactoryParameter()
             {
                 Assert.Throws<ArgumentNullException>(() =>
-                    new CluedIn.Crawling.DropBox.DropBoxCrawler(default(IDropBoxClientFactory), default(ILogger)));
+                    new CluedIn.Crawling.DropBox.DropBoxCrawler(default(IDropBoxClientFactory), default(ILogger), default));
             }
         }
 
@@ -37,6 +38,7 @@ namespace Crawling.DropBox.Unit.Test
             public GetDataTests()
             {
                 var nameClientFactory = new Mock<IDropBoxClientFactory>();
+                var stateMock = new Mock<IAgentJobProcessorState<CrawlJobData>>();
 
                 _clientMock = new Mock<IDropBoxClient>();
 
@@ -48,7 +50,7 @@ namespace Crawling.DropBox.Unit.Test
 
                 nameClientFactory.Setup(x => x.CreateNew(It.IsAny<DropBoxCrawlJobData>())).Returns(_clientMock.Object);
 
-                _sut = new CluedIn.Crawling.DropBox.DropBoxCrawler(nameClientFactory.Object, _logMock.Object);
+                _sut = new CluedIn.Crawling.DropBox.DropBoxCrawler(nameClientFactory.Object, _logMock.Object, stateMock.Object);
 
                 _crawlJobData = new DropBoxCrawlJobData(DropBoxConfiguration.Create());
             }
@@ -79,17 +81,6 @@ namespace Crawling.DropBox.Unit.Test
                     .Returns(Task.FromResult(default(FullAccount)));
 
                 Assert.Empty(
-                    _sut.GetData(_crawlJobData));
-            }
-
-            [Fact]
-            public void ReturnsData()
-            {
-                //_clientMock
-                //    .Setup(x => x.GetCurrentAccountAsync())
-                //    .Returns(Task.FromResult(new FullAccount()));
-
-                Assert.NotEmpty(
                     _sut.GetData(_crawlJobData));
             }
         }

@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using AutoFixture.Xunit2;
 using Castle.Windsor;
 using CluedIn.Core;
+using CluedIn.Core.Data.Relational;
+using CluedIn.Core.DataStore;
 using CluedIn.Core.Logging;
 using CluedIn.Core.Providers;
 using CluedIn.Crawling.DropBox.Core;
@@ -29,18 +31,20 @@ namespace Provider.DropBox.Unit.Test.DropBoxProvider
         protected readonly Dictionary<string, object> Configuration;
         protected readonly DropBoxCrawlJobData CrawlJobData;
         protected readonly Mock<DropBoxClient> Client;
+        protected readonly Mock<IRelationalDataStore<Token>> TokenStore;
 
         protected DropBoxProviderTest()
         {
             Container = new Mock<IWindsorContainer>();
             SystemContext = new Mock<SystemContext>(Container.Object);
+            TokenStore = new Mock<IRelationalDataStore<Token>>();
             NameClientFactory = new Mock<IDropBoxClientFactory>();
             ApplicationContext = new ApplicationContext(Container.Object);
             Logger = new Mock<ILogger>();
             Configuration = DropBoxConfiguration.Create();
             CrawlJobData = new DropBoxCrawlJobData(Configuration);
             Client = new Mock<DropBoxClient>(Logger.Object, CrawlJobData, new RestClient());
-            Sut = new CluedIn.Provider.DropBox.DropBoxProvider(ApplicationContext, NameClientFactory.Object, Logger.Object, null);
+            Sut = new CluedIn.Provider.DropBox.DropBoxProvider(ApplicationContext, NameClientFactory.Object, Logger.Object, null, TokenStore.Object);
 
             NameClientFactory.Setup(n => n.CreateNew(It.IsAny<DropBoxCrawlJobData>())).Returns(() => Client.Object);
         }

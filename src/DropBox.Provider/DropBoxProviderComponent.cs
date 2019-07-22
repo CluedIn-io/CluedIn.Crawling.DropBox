@@ -1,12 +1,16 @@
 using Castle.MicroKernel.Registration;
-
+using Castle.MicroKernel.SubSystems.Configuration;
+using Castle.Windsor;
 using CluedIn.Core;
+using CluedIn.Core.Data.Relational;
+using CluedIn.Core.DataStore;
 using CluedIn.Core.Providers;
 // 
 using CluedIn.Core.Webhooks;
 // 
 using CluedIn.Crawling.DropBox.Core;
 using CluedIn.Crawling.DropBox.Infrastructure.Installers;
+using CluedIn.DataStore.Relational;
 // 
 using CluedIn.Provider.DropBox.WebApi;
 // 
@@ -49,9 +53,20 @@ namespace CluedIn.Provider.DropBox
             Container.Register(Types.FromThisAssembly().BasedOn<IWebhookProcessor>().WithServiceFromInterface().If(t => !t.IsAbstract).LifestyleSingleton());
             Container.Register(Types.FromThisAssembly().BasedOn<IWebhookPrevalidator>().WithServiceFromInterface().If(t => !t.IsAbstract).LifestyleSingleton());
 
+            if (!Container.Kernel.HasComponent(typeof(IRelationalDataStore<Token>)))
+            {
+                Container.Register(Component.For<IRelationalDataStore<Token>>()
+                    .Forward<ISimpleDataStore<Token>>()
+                    .Forward<IDataStore<Token>>()
+                    .Forward<IDataStore>()
+                    .UsingFactoryMethod(() => new TokenDataStore(Container.Resolve<ApplicationContext>()))
+                    .LifestyleSingleton());
+            }
 
             Container.Register(Component.For<DropBoxController>().UsingFactoryMethod(() => new DropBoxController(this)).LifestyleScoped());
             Container.Register(Component.For<DropBoxOAuthController>().UsingFactoryMethod(() => new DropBoxOAuthController(this)).LifestyleScoped());
+
+            
 
 
             State = ServiceState.Started;
