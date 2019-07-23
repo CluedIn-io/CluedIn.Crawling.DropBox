@@ -21,18 +21,13 @@ namespace CluedIn.Crawling.DropBox.Core
 
         public const string CodeOrigin = "DropBox";
         public const string ProviderRootCodeValue = "DropBox";
-        public const string CrawlerName = "DropBox";
+        public const string CrawlerName = "DropBoxCrawler";
         public const string CrawlerComponentName = "DropBoxCrawler";
         public const string CrawlerDescription = "DropBox is a web and mobile application designed to enable sharing and storage of files.";
         public const string CrawlerDisplayName = "DropBox";
         public const string Uri = "https://www.dropbox.com/home ";
         public const string ApiUri = "https://api.dropboxapi.com/2";    // TODO Does this come from configuration?
         public const uint FetchLimit = 2000; // as set by DropBox API
-
-
-        //public const string ClientID = "123456";
-        //public const string ClientSecret = "12345";
-
 
         public static readonly Guid ProviderId = Guid.Parse("32811664-085F-4551-BCD0-033CC5171179"); 
         public const string ProviderName = "DropBox";         
