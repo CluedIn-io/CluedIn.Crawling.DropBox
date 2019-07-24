@@ -11,7 +11,6 @@ using CluedIn.Core.Logging;
 using CluedIn.Crawling.DropBox.Core;
 using CluedIn.Crawling.DropBox.Infrastructure;
 using CluedIn.Crawling.DropBox.Infrastructure.Factories;
-using com.googlecode.mp4parser.authoring.tracks.h265;
 using Dropbox.Api.Files;
 
 namespace CluedIn.Crawling.DropBox
@@ -22,13 +21,12 @@ namespace CluedIn.Crawling.DropBox
         private readonly ILogger _log;
 
         private static readonly IEnumerable<object> EmptyResult = Enumerable.Empty<object>();
-        private IAgentJobProcessorState<CrawlJobData> _state;
+        private readonly IAgentJobProcessorState<CrawlJobData> _state;
 
         public DropBoxCrawler(IDropBoxClientFactory clientFactory, ILogger log, IAgentJobProcessorState<CrawlJobData> state)
         {
             _clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
             _log = log ?? throw new ArgumentNullException(nameof(log));
-            _state = state;
             _state = state;
         }
 
@@ -57,7 +55,7 @@ namespace CluedIn.Crawling.DropBox
 
                 var list = new List<object> { account };
 
-                GetFolderItemsAsync(CrawlOptions.Recursive, client, crawlerJobData, list);
+                GetFolderItems(CrawlOptions.Recursive, client, crawlerJobData, list);
                 GetSharedFolders(client, list);
 
                 // Index files
@@ -74,7 +72,7 @@ namespace CluedIn.Crawling.DropBox
         }
 
 
-        private void GetFolderItemsAsync(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, IList<object> list)
+        private void GetFolderItems(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, IList<object> list)
         {
             try
             {
@@ -82,7 +80,7 @@ namespace CluedIn.Crawling.DropBox
                 if (jobData.LastCrawlFinishTime > DateTimeOffset.MinValue && jobData.LastestCursors != null && jobData.LastestCursors.ContainsKey("Files") && !string.IsNullOrEmpty(jobData.LastestCursors["Files"]))
                 {
                     var cursor = jobData.LastestCursors["Files"];
-                    GetFolderItemsFromCursorAsync(options, cursor, client, jobData, list);
+                    GetFolderItemsFromCursor(options, cursor, client, jobData, list);
                 }
                 else
                 {
@@ -90,13 +88,13 @@ namespace CluedIn.Crawling.DropBox
 
                     if (!folders.Any() || folders.Contains("/") || folders.Contains(string.Empty))
                     {
-                        GetFolderItemsAsync(options, client, jobData,"/", new HashSet<string>(), list);
+                        GetFolderItems(options, client, jobData,"/", new HashSet<string>(), list);
                     }
                     else
                     {
                         foreach (var path in folders)
                         {
-                            GetFolderItemsAsync(options, client, jobData, path, new HashSet<string>(), list);
+                            GetFolderItems(options, client, jobData, path, new HashSet<string>(), list);
                         }
                     }
                 }
@@ -143,7 +141,7 @@ namespace CluedIn.Crawling.DropBox
             }
         }
 
-        private void GetFolderItemsFromCursorAsync(CrawlOptions options, string cursor, IDropBoxClient client, DropBoxCrawlJobData jobData, IList<object> list)
+        private void GetFolderItemsFromCursor(CrawlOptions options, string cursor, IDropBoxClient client, DropBoxCrawlJobData jobData, IList<object> list)
         {
             if (_state.CancellationTokenSource.IsCancellationRequested)
                 return;
@@ -177,7 +175,6 @@ namespace CluedIn.Crawling.DropBox
 
             try
             {
-                // TODO: Should we get the files here?
                 var sharedFolders = client.ListFoldersAsync().Result;
 
                 if (sharedFolders == null)
@@ -220,16 +217,14 @@ namespace CluedIn.Crawling.DropBox
             if (_state.CancellationTokenSource.IsCancellationRequested)
                 return;
 
-
             try
             {
-                var ids = jobData.Folders?.Select(sp => sp.EntryPoint) ?? new string[] { };
+                var ids = (jobData.Folders?.Select(sp => sp.EntryPoint) ?? new string[] { }).ToList();
 
                 do
                 {
                     var files = items.Entries.Where(i => i != null && i.IsFile).Select(i => i.AsFile);
                     var folders = items.Entries.Where(i => i != null && i.IsFolder).Select(i => i.AsFolder);
-                    //var deleted = items.Entries.Where(i => i != null && i.IsDeleted).Select(i => i.AsDeleted); // TODO - left over from legacy crawler
 
                     var concurrencyLevel = ConfigurationManager.AppSettings.GetValue("Providers.Dropbox.CrawlConcurrencyLevel", Environment.ProcessorCount);
 
@@ -259,7 +254,7 @@ namespace CluedIn.Crawling.DropBox
 
                             if (iterateFolders)
                             {
-                                GetFolderItemsAsync(options, client, jobData, folder.PathLower, visitedFolders, list);
+                                GetFolderItems(options, client, jobData, folder.PathLower, visitedFolders, list);
                             }
                         }
                     }
@@ -296,7 +291,7 @@ namespace CluedIn.Crawling.DropBox
             return path;
         }
 
-        private void GetFolderItemsAsync(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, string path, HashSet<string> visitedFolders, IList<object> list)
+        private void GetFolderItems(CrawlOptions options, IDropBoxClient client, DropBoxCrawlJobData jobData, string path, HashSet<string> visitedFolders, IList<object> list)
         {
             if (_state.CancellationTokenSource.IsCancellationRequested) return;
 
@@ -363,8 +358,6 @@ namespace CluedIn.Crawling.DropBox
             catch (Exception exception)
             {
                 _log.Error(new { Path = file.PathLower }, () => "Could not fetch versions data from path in Dropbox", exception);
-
-                // TODO: Why are we getting the file metadata again? We already have it in the content variable
 
                 // If I could not fetch the individual versions then go just get the MetaData for the latest version
                 try

@@ -27,7 +27,7 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
 
             if (factory is DropBoxClueFactory dropBoxClueFactory)
             {
-                _providerRoot = dropBoxClueFactory.ProviderRoot; // TODO think of better way of doing referencing the base provider clue
+                _providerRoot = dropBoxClueFactory.ProviderRoot; 
             }
         }
 

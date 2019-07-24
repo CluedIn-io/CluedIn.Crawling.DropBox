@@ -55,7 +55,7 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
 
             if (factory is DropBoxClueFactory dropBoxClueFactory)
             {
-                _providerRoot = dropBoxClueFactory.ProviderRoot; // TODO think of better way of doing referencing the base provider clue
+                _providerRoot = dropBoxClueFactory.ProviderRoot;
             }
         }
 
@@ -161,7 +161,7 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
                         var thumbnail = client.GetThumbnailAsync(value.PathLower, ThumbnailFormat.Jpeg.Instance, ThumbnailSize.W1024h768.Instance).Result;
 
                         var bytes = thumbnail.GetContentAsByteArrayAsync().Result;
-                        var rawDataPart = new RawDataPart()
+                        var rawDataPart = new RawDataPart
                         {
                             Type = "/RawData/PreviewImage",
                             MimeType = CluedIn.Core.FileTypes.MimeType.Jpeg.Code,

@@ -43,7 +43,7 @@ namespace CluedIn.Provider.DropBox.WebHooks
                 {
                     var providerDefinition = context.Organization.Providers.GetProviderDefinition(context, command.WebhookDefinition.ProviderDefinitionId.Value);
                     var jobDataCheck       = context.ApplicationContext.Container.ResolveAll<IProvider>().FirstOrDefault(providerInstance => providerDefinition != null && providerInstance.Id == providerDefinition.ProviderId);
-                    var configStoreData    = configurationDataStore.GetConfigurationById(context, command.WebhookDefinition.ProviderDefinitionId.Value);  // TODO RJ the configStoreData var is never used. Should it be ?
+                    var configStoreData    = configurationDataStore.GetConfigurationById(context, command.WebhookDefinition.ProviderDefinitionId.Value); 
 
                     // If you have stopped the provider then don't process the webhooks
                     if (providerDefinition?.WebHooks != null)

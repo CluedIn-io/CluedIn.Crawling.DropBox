@@ -52,7 +52,7 @@ namespace CluedIn.Provider.DropBox
 
             if (_tokenStore == null)
             {
-                return new CrawlJobData() { Errors = new Dictionary<string, string>() { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
+                return new CrawlJobData { Errors = new Dictionary<string, string> { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
             }
 
             var accounts = await _tokenStore.SelectAsync(context, account => account.ProviderId == dropBoxProviderId && account.OrganizationId == organizationId && account.UserId == userId && account.ConfigurationId == providerDefinitionId);
@@ -77,10 +77,10 @@ namespace CluedIn.Provider.DropBox
             }
 
             //Add Authentication for all Accounts here
-            var agentToken = accounts.Select(i => new AgentToken() { AccessToken = i.AccessToken, RefreshToken = i.RefreshToken, ExpiresIn = i.ExpiresIn }).FirstOrDefault();
+            var agentToken = accounts.Select(i => new AgentToken { AccessToken = i.AccessToken, RefreshToken = i.RefreshToken, ExpiresIn = i.ExpiresIn }).FirstOrDefault();
             if (agentToken == null)
             {
-                return new CrawlJobData() { Errors = new Dictionary<string, string>() { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
+                return new CrawlJobData { Errors = new Dictionary<string, string> { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
             }
 
             if (!configuration.ContainsKey("baseUri"))
@@ -152,7 +152,7 @@ namespace CluedIn.Provider.DropBox
             //No need to look for a refresh token as it will only stop working if the person uninstalls the app. https://www.dropbox.com/developers/reference/oauthguide
             if (!jobData.IsAuthenticated)
             {
-                return new CrawlJobData() { Errors = new Dictionary<string, string>() { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
+                return new CrawlJobData { Errors = new Dictionary<string, string> { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
             }
 
             if (ConfigurationManager.AppSettings.GetFlag("Feature.Webhooks.Enabled", false) && SupportsWebHooks)
@@ -280,21 +280,21 @@ namespace CluedIn.Provider.DropBox
                         throw new ApplicationException("The crawl data does not contain an access token");
                     }
 
-                    _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Authenticating", UserId = userId });
+                    _notifications?.Publish(new ProviderMessageCommand { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Authenticating", UserId = userId });
                     var client = _dropboxClientFactory.CreateNew(dropBoxCrawlJobData);
 
-                    _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
+                    _notifications?.Publish(new ProviderMessageCommand { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
 
                     var full = await client.ListFolderAsync(string.Empty, DropBoxConstants.FetchLimit, false);
-                    var folderProjection = full.Entries.Where(i => i.IsFolder).Select(item => new FolderProjection() { Id = item.PathLower, Name = item.Name, Parent = string.IsNullOrEmpty(item.PathLower.Remove(item.PathLower.LastIndexOf('/'))) ? "/" : item.PathLower.Remove(item.PathLower.LastIndexOf('/')), Sensitive = ConfigurationManager.AppSettings["Configuration.Sensitive"] != null && ConfigurationManager.AppSettings["Configuration.Sensitive"].Split(',').Contains(item.Name), Permissions = new List<CluedInPermission>(), Active = true }).ToList();
+                    var folderProjection = full.Entries.Where(i => i.IsFolder).Select(item => new FolderProjection { Id = item.PathLower, Name = item.Name, Parent = string.IsNullOrEmpty(item.PathLower.Remove(item.PathLower.LastIndexOf('/'))) ? "/" : item.PathLower.Remove(item.PathLower.LastIndexOf('/')), Sensitive = ConfigurationManager.AppSettings["Configuration.Sensitive"] != null && ConfigurationManager.AppSettings["Configuration.Sensitive"].Split(',').Contains(item.Name), Permissions = new List<CluedInPermission>(), Active = true }).ToList();
 
-                    folderProjection.Add(new FolderProjection() { Id = "/", Name = "Root Folder", Parent = (string)null, Sensitive = false, Permissions = (List<CluedInPermission>)null, Active = true });
+                    folderProjection.Add(new FolderProjection { Id = "/", Name = "Root Folder", Parent = (string)null, Sensitive = false, Permissions = (List<CluedInPermission>)null, Active = true });
 
                     var cursor = full.Cursor;
                     var hasMore = full.HasMore;
                     while (cursor != null && hasMore)
                     {
-                        _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
+                        _notifications?.Publish(new ProviderMessageCommand { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Folders", UserId = userId });
 
                         var fullWithCursor = await client.ListFolderContinueAsync(cursor);
 
@@ -302,7 +302,7 @@ namespace CluedIn.Provider.DropBox
                         {
                             if (!folderProjection.Select(d => d.Id).Contains(fol.PathLower))
                             {
-                                folderProjection.Add(new FolderProjection() { Id = fol.PathLower, Name = fol.Name, Parent = string.IsNullOrEmpty(fol.PathLower.Remove(fol.PathLower.LastIndexOf('/'))) ? "/" : fol.PathLower.Remove(fol.PathLower.LastIndexOf('/')), Sensitive = ConfigurationManager.AppSettings["Configuration.Sensitive"] != null && ConfigurationManager.AppSettings["Configuration.Sensitive"].Split(',').Contains(fol.Name), Permissions = new List<CluedInPermission>(), Active = true });
+                                folderProjection.Add(new FolderProjection { Id = fol.PathLower, Name = fol.Name, Parent = string.IsNullOrEmpty(fol.PathLower.Remove(fol.PathLower.LastIndexOf('/'))) ? "/" : fol.PathLower.Remove(fol.PathLower.LastIndexOf('/')), Sensitive = ConfigurationManager.AppSettings["Configuration.Sensitive"] != null && ConfigurationManager.AppSettings["Configuration.Sensitive"].Split(',').Contains(fol.Name), Permissions = new List<CluedInPermission>(), Active = true });
                             }
                         }
 
@@ -310,7 +310,7 @@ namespace CluedIn.Provider.DropBox
                         hasMore = fullWithCursor.HasMore;
                     }
 
-                    _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Shared Folders", UserId = userId });
+                    _notifications?.Publish(new ProviderMessageCommand { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Fetching Shared Folders", UserId = userId });
 
                     var responseFromBox = await client.GetFolderListViaRestAsync();
                     if (responseFromBox != null)
@@ -324,7 +324,7 @@ namespace CluedIn.Provider.DropBox
                                 {
                                     if (!folderProjection.Select(d => d.Id).Contains(sharedFolder.path_lower))
                                     {
-                                        folderProjection.Add(new FolderProjection() { Id = sharedFolder.path_lower, Name = sharedFolder.name, Parent = "/", Sensitive = false, Permissions = responseFromBox1.groups.Select(s => new CluedInPermission() { }).Concat(responseFromBox1.invitees.Select(s => new CluedInPermission() { })).Concat(responseFromBox1.users.Select(s => new CluedInPermission() { })).ToList(), Active = true });
+                                        folderProjection.Add(new FolderProjection { Id = sharedFolder.path_lower, Name = sharedFolder.name, Parent = "/", Sensitive = false, Permissions = responseFromBox1.groups.Select(s => new CluedInPermission { }).Concat(responseFromBox1.invitees.Select(s => new CluedInPermission { })).Concat(responseFromBox1.users.Select(s => new CluedInPermission { })).ToList(), Active = true });
                                     }
                                 }
                             }
@@ -332,7 +332,7 @@ namespace CluedIn.Provider.DropBox
                     }
 
                     //Created,Uploaded,Commented,Downloaded,Previewed,Moved,Copied
-                    configuration.Add("webhooks", new List<object>()
+                    configuration.Add("webhooks", new List<object>
                     {
                         new { DisplayName = "Created",      Name = "Created",     Status = "ACTIVE", Description = "When a new file or folder is created."},
                         new { DisplayName = "Uploaded",      Name = "Uploaded",     Status = "ACTIVE", Description = "When a new file or folder is uploaded."},
@@ -360,10 +360,10 @@ namespace CluedIn.Provider.DropBox
                     //This MUST be called after the previosFolderCount has been assigned
                     CheckForNewConfiguration(context, organizationId, providerDefinitionId, dropBoxCrawlJobData, folderProjection.Count);
 
-                    _notifications?.Publish(new ProviderMessageCommand() { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Forecasting projected processing time", UserId = userId });
+                    _notifications?.Publish(new ProviderMessageCommand { OrganizationId = organizationId, ProviderDefinitionId = providerDefinitionId, ProviderId = Id, ProviderName = Name, Message = "Forecasting projected processing time", UserId = userId });
 
                     var usage = await client.GetSpaceUsageAsync();
-                    configuration.Add("usage", new Usage() { UsedSpace = (long)usage.Used, NumberOfClues = null, TotalSpace = null });
+                    configuration.Add("usage", new Usage { UsedSpace = (long)usage.Used, NumberOfClues = null, TotalSpace = null });
 
                     dropBoxCrawlJobData.ExpectedStatistics?.EntityTypeStatistics?.Add(new EntityTypeStatistics(EntityType.Files.Directory, folderProjection.Count, 0));
                     configuration.Add("expectedStatistics", dropBoxCrawlJobData.ExpectedStatistics);
@@ -372,7 +372,7 @@ namespace CluedIn.Provider.DropBox
                 catch (Exception exception)
                 {
                     _log.Warn(() => "Could not add DropBox provider", exception);
-                    return new Dictionary<string, object>() { { "error", "Could not fetch configuration data from DropBox" } };
+                    return new Dictionary<string, object> { { "error", "Could not fetch configuration data from DropBox" } };
                 }
             }
 
@@ -442,7 +442,7 @@ namespace CluedIn.Provider.DropBox
                                             { "Configuration", "folders" }
                                         };
 
-                                        notificationDataStore.Insert(context, new Notification()
+                                        notificationDataStore.Insert(context, new Notification
                                         {
                                             Count = 1,
                                             CreatedDate = DateTime.UtcNow,
@@ -457,7 +457,7 @@ namespace CluedIn.Provider.DropBox
                                         });
 
                                         context.ApplicationContext.System.Notifications.Publish(
-                                            new NewConfigurationCommand()
+                                            new NewConfigurationCommand
                                             {
                                                 OrganizationId = context.Organization.Id.ToString(),
                                                 Configuration = "folders",
@@ -507,7 +507,7 @@ namespace CluedIn.Provider.DropBox
             {
                 var webhookSignatures = new List<WebHookSignature>();
 
-                var webhookSignature = new WebHookSignature() { Signature = webhookDefinition.ProviderDefinitionId.ToString(), ExternalVersion = "v1", ExternalId = null, EventTypes = "Created,Uploaded,Commented,Downloaded,Previewed,Moved,Copied" };
+                var webhookSignature = new WebHookSignature { Signature = webhookDefinition.ProviderDefinitionId.ToString(), ExternalVersion = "v1", ExternalId = null, EventTypes = "Created,Uploaded,Commented,Downloaded,Previewed,Moved,Copied" };
 
                 webhookSignatures.Add(webhookSignature);
 

@@ -13,8 +13,7 @@ namespace Provider.DropBox.Unit.Test.DropBoxProvider
     [InlineAutoData]
     public void GetCrawlJobDataTests(Dictionary<string, object> dictionary, Guid organizationId, Guid userId, Guid providerDefinitionId)
     {
-      //TODO: passing null here does not look good
-      Sut.GetCrawlJobData(null, dictionary, organizationId, userId, providerDefinitionId)
+        Sut.GetCrawlJobData(null, dictionary, organizationId, userId, providerDefinitionId)
           .ShouldNotBeNull();
     }
   }

@@ -34,7 +34,7 @@ namespace CluedIn.Crawling.DropBox.Factories
 
             var iconBytes = GetIcon();
 
-            var rawDataPart = new RawDataPart()
+            var rawDataPart = new RawDataPart
             {
                 Type = "/RawData/PreviewImage",
                 MimeType = MimeType.Jpeg.Code,

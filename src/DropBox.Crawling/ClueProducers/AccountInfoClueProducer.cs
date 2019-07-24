@@ -26,7 +26,6 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
 
             var clue = _factory.Create(EntityType.Infrastructure.User, input.AccountId, accountId);
 
-            // TODO: Populate clue data
             var data = clue.Data.EntityData;
 
             if (input.Name != null)

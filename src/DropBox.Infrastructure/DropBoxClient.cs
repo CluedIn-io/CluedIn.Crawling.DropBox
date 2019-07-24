@@ -35,7 +35,7 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
             _restClient.AddDefaultHeader("Authorization", "Bearer " + dropBoxCrawlJobData.Token.AccessToken);
             //_restClient.AddDefaultHeader("API-Select-Admin", dropBoxCrawlJobData.AdminMemberId); // TODO confirm we want to access as admin in DropBox Business accounts (see https://www.dropbox.com/developers/documentation/http/teams)
 
-            _dropBoxClient = new DropboxClient(dropBoxCrawlJobData.Token.AccessToken); // TODO figure out to DI this
+            _dropBoxClient = new DropboxClient(dropBoxCrawlJobData.Token.AccessToken); 
         }
 
 
@@ -52,7 +52,7 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
             catch (Exception exception)
             {
                 _log.Warn(() => "Could not add DropBox provider", exception);
-                return new AccountInformation(accountId, accountDisplay) { Errors = new Dictionary<string, string>() { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
+                return new AccountInformation(accountId, accountDisplay) { Errors = new Dictionary<string, string> { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
             }
 
             return new AccountInformation(accountId, accountDisplay);
@@ -121,9 +121,6 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
         {
             do
             {
-                //if (_state.CancellationTokenSource.IsCancellationRequested) // TODO Find out how to access state
-                //    throw new OperationCanceledException();
-
                 try
                 {
                     return await func();
@@ -134,7 +131,7 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
 
                     if (flat.InnerExceptions.Count == 1 && flat.InnerExceptions[0] is RateLimitException rateEx)
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(rateEx.RetryAfter)); //, _state.CancellationTokenSource.Token);  // TODO Find out how to access state
+                        await Task.Delay(TimeSpan.FromSeconds(rateEx.RetryAfter)); 
                     }
                     else
                     {
@@ -143,7 +140,7 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
                 }
                 catch (RateLimitException ex)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(ex.RetryAfter)); //, _state.CancellationTokenSource.Token);  // TODO Find out how to access state
+                    await Task.Delay(TimeSpan.FromSeconds(ex.RetryAfter)); 
                 }
             }
             while (true);
@@ -196,7 +193,7 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
             public QueryStringParameter(string name, object value)
             {
                 Parameter =
-                  new Parameter()
+                  new Parameter
                   {
                       Type = ParameterType.QueryString,
                       Name = name,

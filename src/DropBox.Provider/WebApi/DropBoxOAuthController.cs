@@ -43,7 +43,6 @@ namespace CluedIn.Provider.DropBox.WebApi
         [HttpGet]
         public async Task<HttpResponseMessage> Get(string code, string state)
         {
-            // TODO call to CreateRequestSystemExecutionContext is using the system organization, NOT that of the calling app (ie foobar)
             using (var system = CreateRequestSystemExecutionContext())
             {
                 // NOTE: In production, OAuth must be done over a secure HTTPS connection.
@@ -115,7 +114,6 @@ namespace CluedIn.Provider.DropBox.WebApi
         {
             var response = Request.CreateResponse(HttpStatusCode.OK);
 
-            // TODO context.Organization is picking up System organization and creating worng redirect URL. Should be organization of calling app user
             if (ConfigurationManager.AppSettings.GetFlag("NewRedirectUrl", false))
             {
                 response.Content = new StringContent($"<script>window.location = \"https://{context.Organization.ApplicationSubDomain}.{ConfigurationManager.AppSettings.GetValue("Domain", Constants.Configuration.Defaults.Domain)}/admin/integrations/callback/dropbox\";</script>", Encoding.UTF8, "text/html");
@@ -127,7 +125,6 @@ namespace CluedIn.Provider.DropBox.WebApi
             }
             else
             {
-                // TODO: Get base url from config
                 response.Content = new StringContent($"<script>window.location = \"https://{context.Organization.ApplicationSubDomain}.{ConfigurationManager.AppSettings.GetValue("Domain", Constants.Configuration.Defaults.Domain)}/admin/#/administration/integration/dropbox/callback\";</script>", Encoding.UTF8, "text/html");
                 if (reAuthenticated)
                 {
@@ -249,7 +246,7 @@ namespace CluedIn.Provider.DropBox.WebApi
         /// <summary>Gets the specified error.</summary>
         /// <param name="error">The error.</param>
         /// <returns></returns>
-        public HttpResponseMessage Get([NotNull] string error)   // TODO could this method be renamed to GetErrorResponse
+        public HttpResponseMessage Get([NotNull] string error)   
         {
             if (error == null)
             {

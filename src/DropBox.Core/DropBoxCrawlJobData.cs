@@ -75,7 +75,7 @@ namespace CluedIn.Crawling.DropBox.Core
 
                 Folders = new List<CrawlEntry>();
 
-                Folders.AddRange(ids.Select(s => new CrawlEntry()
+                Folders.AddRange(ids.Select(s => new CrawlEntry
                 {
                     CrawlOptions = configuration.ContainsKey("crawlOptions")
                         ? ((CrawlOptions)configuration["crawlOptions"])
@@ -138,7 +138,7 @@ namespace CluedIn.Crawling.DropBox.Core
                     //var refreshToken = jUser.GetValue("RefreshToken").Value<string>();
 
 
-                    user = new AgentToken() { AccessToken = accessToken, RefreshToken = null, ExpiresIn = null };
+                    user = new AgentToken { AccessToken = accessToken, RefreshToken = null, ExpiresIn = null };
                 }
 
                 Token = user;
