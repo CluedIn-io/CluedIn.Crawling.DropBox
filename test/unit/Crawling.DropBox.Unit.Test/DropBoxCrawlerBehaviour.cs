@@ -24,7 +24,7 @@ namespace Crawling.DropBox.Unit.Test
             public void ConstructorRequiresClientFactoryParameter()
             {
                 Assert.Throws<ArgumentNullException>(() =>
-                    new CluedIn.Crawling.DropBox.DropBoxCrawler(default(IDropBoxClientFactory), default(ILogger), default));
+                    new CluedIn.Crawling.DropBox.DropBoxCrawler(default(IDropBoxClientFactory), default(ILogger), default(IAgentJobProcessorState<CrawlJobData>)));
             }
         }
 
