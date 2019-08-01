@@ -15,8 +15,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CluedIn.DataStore" Version="2.18.0-pullrequest0724-0841" />
-    <PackageReference Include="CluedIn.Server" Version="2.18.0-alpha0846" />
+    <PackageReference Include="CluedIn.DataStore" Version="2.18.0-alpha0935" />
+    <PackageReference Include="CluedIn.Server" Version="2.18.0-alpha0935" />
     <PackageReference Include="ComponentHost" Version="1.0.0.46" />
     <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
     <PackageReference Include="Microsoft.Web.Xdt" Version="2.1.1" />
