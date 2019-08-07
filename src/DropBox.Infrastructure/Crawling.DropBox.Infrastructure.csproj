@@ -10,7 +10,7 @@
     <OutputPath>.\bin\Debug</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CluedIn.Server" Version="2.18.0-alpha0935" />
+    <PackageReference Include="CluedIn.Server" Version="2.18.0-alpha0938" />
     <PackageReference Include="Dropbox.Api" Version="4.9.4" />
     <PackageReference Include="System.Management" Version="4.5.0" />
   </ItemGroup>
