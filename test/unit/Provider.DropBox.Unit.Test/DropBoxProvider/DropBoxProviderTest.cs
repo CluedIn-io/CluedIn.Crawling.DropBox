@@ -9,9 +9,11 @@ using CluedIn.Core.DataStore;
 using CluedIn.Core.Logging;
 using CluedIn.Core.Providers;
 using CluedIn.Crawling.DropBox.Core;
+using CluedIn.Crawling.DropBox.Core.Models;
 using CluedIn.Crawling.DropBox.Infrastructure;
 using CluedIn.Crawling.DropBox.Infrastructure.Factories;
 using CluedIn.Crawling.DropBox.Test.Common;
+using Dropbox.Api.Files;
 using Dropbox.Api.Users;
 using Moq;
 using RestSharp;
@@ -30,7 +32,7 @@ namespace Provider.DropBox.Unit.Test.DropBoxProvider
         protected readonly Guid OrganizationId = Guid.NewGuid();
         protected readonly Dictionary<string, object> Configuration;
         protected readonly DropBoxCrawlJobData CrawlJobData;
-        protected readonly Mock<DropBoxClient> Client;
+        protected readonly Mock<IDropBoxClient> Client;
         protected readonly Mock<IRelationalDataStore<Token>> TokenStore;
 
         protected DropBoxProviderTest()
@@ -43,7 +45,8 @@ namespace Provider.DropBox.Unit.Test.DropBoxProvider
             Logger = new Mock<ILogger>();
             Configuration = DropBoxConfiguration.Create();
             CrawlJobData = new DropBoxCrawlJobData(Configuration);
-            Client = new Mock<DropBoxClient>(Logger.Object, CrawlJobData, new RestClient());
+            Client = new Mock<IDropBoxClient>();
+
             Sut = new CluedIn.Provider.DropBox.DropBoxProvider(ApplicationContext, NameClientFactory.Object, Logger.Object, null, TokenStore.Object);
 
             NameClientFactory.Setup(n => n.CreateNew(It.IsAny<DropBoxCrawlJobData>())).Returns(() => Client.Object);
@@ -78,6 +81,10 @@ namespace Provider.DropBox.Unit.Test.DropBoxProvider
             public async Task GetHelperConfigurationReturnsWebHooks()
             {
                 // TODO Setup Client to fake data
+                Client.Setup(n => n.ListFolderAsync(It.IsAny<string>(), It.IsAny<uint?>(), false)).ReturnsAsync(new ListFolderResult(new List<Metadata>(), "abc", false));
+                Client.Setup(n => n.GetFolderListViaRestAsync()).ReturnsAsync(default(FolderList));
+                Client.Setup(n => n.GetSpaceUsageAsync()).ReturnsAsync(new SpaceUsage());
+
                 var result = await Sut.GetHelperConfiguration(null, CrawlJobData, OrganizationId, Guid.Empty, Guid.Empty);
 
                 Assert.NotNull(result);

@@ -21,7 +21,7 @@ namespace Crawling.DropBox.Integration.Test.DropBoxClient
             var logger = new Mock<ILogger>();
             var jobData = new DropBoxCrawlJobData(DropBoxConfiguration.Create());
 
-            _sut = new CluedIn.Crawling.DropBox.Infrastructure.DropBoxClient(logger.Object, jobData, new RestClient());
+            _sut = new CluedIn.Crawling.DropBox.Infrastructure.DropBoxClient(logger.Object, new RestClient(), jobData);
         }
 
         [Fact]

@@ -20,22 +20,30 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
     public class DropBoxClient : IDropBoxClient
     {
         private readonly IRestClient _restClient;
-        private readonly DropboxClient _dropBoxClient;
+        private DropboxClient _dropBoxClient;
         private readonly ILogger _log;
 
         // TODO Create parameterless constructor, make privates as properties of interface so we can mock this class
+        public DropBoxClient(ILogger log, IRestClient restClient) : this(log, restClient, null)
+        {
+        }
 
-        public DropBoxClient(ILogger log, DropBoxCrawlJobData dropBoxCrawlJobData, IRestClient restClient) 
+        public DropBoxClient(ILogger log, IRestClient restClient, DropBoxCrawlJobData dropBoxCrawlJobData) 
         {
             _log = log ?? throw new ArgumentNullException(nameof(log));
             _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
 
+            InitializeClients(dropBoxCrawlJobData);
+        }
+
+        public void InitializeClients(DropBoxCrawlJobData dropBoxCrawlJobData)
+        {
             _restClient.BaseUrl = new Uri(DropBoxConstants.ApiUri);
-           //_restClient.AddDefaultParameter("api_key", dropBoxCrawlJobData.ClientId, ParameterType.QueryString);
+            //_restClient.AddDefaultParameter("api_key", dropBoxCrawlJobData.ClientId, ParameterType.QueryString);
             _restClient.AddDefaultHeader("Authorization", "Bearer " + dropBoxCrawlJobData.Token.AccessToken);
             //_restClient.AddDefaultHeader("API-Select-Admin", dropBoxCrawlJobData.AdminMemberId); // TODO confirm we want to access as admin in DropBox Business accounts (see https://www.dropbox.com/developers/documentation/http/teams)
 
-            _dropBoxClient = new DropboxClient(dropBoxCrawlJobData.Token.AccessToken); 
+            _dropBoxClient = new DropboxClient(dropBoxCrawlJobData.Token.AccessToken);
         }
 
 
@@ -73,6 +81,7 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
         public async Task<ListFoldersResult> ListFoldersContinueAsync(string cursor) =>
             await Execute(async () => await _dropBoxClient.Sharing.ListFoldersContinueAsync(cursor));
 
+        // Marked as virtual for testing purposes
         public async Task<ListFolderResult> ListFolderAsync(string path, uint? limit = 10, bool includeDeleted = false) =>
             await Execute(async () => await _dropBoxClient.Files.ListFolderAsync(path: path, includeDeleted: includeDeleted, limit: limit));
 
