@@ -30,12 +30,12 @@ namespace CluedIn.Crawling.DropBox.Vocabularies
             {
                 TeamName        = group.Add(new VocabularyKey("teamName"));
                 FamiliarName    = group.Add(new VocabularyKey("familiar_name"));
-                ReferredLink    = group.Add(new VocabularyKey("referredLink", VocabularyKeyVisiblity.Hidden));
-                QuotaInfoNormal = group.Add(new VocabularyKey("quotaInfoNormal", VocabularyKeyVisiblity.Hidden));
-                QuotaInfoQuota  = group.Add(new VocabularyKey("quotaInfoQuota", VocabularyKeyVisiblity.Hidden));
-                QuotaInfoShared = group.Add(new VocabularyKey("quotaInfoShared", VocabularyKeyVisiblity.Hidden));
-                Locale          = group.Add(new VocabularyKey("locale", VocabularyKeyVisiblity.Hidden));
-                IsPaired        = group.Add(new VocabularyKey("isPaired", VocabularyKeyVisiblity.Hidden));
+                ReferredLink    = group.Add(new VocabularyKey("referredLink", VocabularyKeyVisibility.Hidden));
+                QuotaInfoNormal = group.Add(new VocabularyKey("quotaInfoNormal", VocabularyKeyVisibility.Hidden));
+                QuotaInfoQuota  = group.Add(new VocabularyKey("quotaInfoQuota", VocabularyKeyVisibility.Hidden));
+                QuotaInfoShared = group.Add(new VocabularyKey("quotaInfoShared", VocabularyKeyVisibility.Hidden));
+                Locale          = group.Add(new VocabularyKey("locale", VocabularyKeyVisibility.Hidden));
+                IsPaired        = group.Add(new VocabularyKey("isPaired", VocabularyKeyVisibility.Hidden));
             });
 
             GivenName = Add(new VocabularyKey("givenName"));

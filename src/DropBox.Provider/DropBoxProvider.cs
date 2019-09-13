@@ -20,6 +20,7 @@ using CluedIn.Crawling.DropBox.Core.Models;
 using CluedIn.Crawling.DropBox.Infrastructure.Factories;
 using CluedIn.Providers.Models;
 using CluedIn.Providers.Webhooks.Models;
+using EntityType = CluedIn.Core.Data.EntityType;
 
 namespace CluedIn.Provider.DropBox
 {

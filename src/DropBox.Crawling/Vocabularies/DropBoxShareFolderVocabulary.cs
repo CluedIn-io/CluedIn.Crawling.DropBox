@@ -30,7 +30,7 @@ namespace CluedIn.Crawling.DropBox.Vocabularies
             AddGroup("Dropbox Shared Folder Details", group =>
             {
                 FolderPath       = group.Add(new VocabularyKey("folderPath"));
-                Owner            = group.Add(new VocabularyKey("owner", VocabularyKeyVisiblity.Hidden));
+                Owner            = group.Add(new VocabularyKey("owner", VocabularyKeyVisibility.Hidden));
                 AccessType       = group.Add(new VocabularyKey("accessType"));
                 SharedLinkPolicy = group.Add(new VocabularyKey("sharedLinkPolicy"));
             });

@@ -28,7 +28,7 @@ namespace CluedIn.Crawling.DropBox.Vocabularies
             AddGroup("Dropbox Group Details", group =>
             {
                 MemberCount = group.Add(new VocabularyKey("memberCount", VocabularyKeyDataType.Number));
-                SameTeam    = group.Add(new VocabularyKey("sameTeam", VocabularyKeyDataType.Boolean, VocabularyKeyVisiblity.Hidden));
+                SameTeam    = group.Add(new VocabularyKey("sameTeam", VocabularyKeyDataType.Boolean, VocabularyKeyVisibility.Hidden));
             });
         }
 

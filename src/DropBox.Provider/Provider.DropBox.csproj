@@ -22,13 +22,13 @@
     <Content Include="Provider.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CluedIn.Core" Version="2.18.0-alpha0939" />
-    <PackageReference Include="CluedIn.Core.Agent" Version="2.18.0-alpha0939" />
-    <PackageReference Include="CluedIn.Core.Data.Repositories" Version="2.18.0-alpha0939" />
-    <PackageReference Include="CluedIn.Core.Data.Validation" Version="2.18.0-alpha0939" />
-    <PackageReference Include="CluedIn.Crawling" Version="2.18.0-alpha0939" />
-    <PackageReference Include="CluedIn.Server" Version="2.18.0-alpha0939" />
-    <PackageReference Include="CluedIn.Server.Common.WebApi" Version="2.18.0-alpha0862" />
+    <PackageReference Include="CluedIn.Core" Version="2.4.0-alpha0077" />
+    <PackageReference Include="CluedIn.Core.Agent" Version="2.4.0-alpha0077" />
+    <PackageReference Include="CluedIn.Core.Data.Repositories" Version="2.4.0-alpha0077" />
+    <PackageReference Include="CluedIn.Core.Data.Validation" Version="2.4.0-alpha0077" />
+    <PackageReference Include="CluedIn.Crawling" Version="2.4.0-alpha0077" />
+    <PackageReference Include="CluedIn.Server" Version="2.4.0-alpha0077" />
+    <PackageReference Include="CluedIn.Server.Common.WebApi" Version="2.4.0-alpha0077" />
     <PackageReference Include="ComponentHost" Version="1.0.0.46" />
     <PackageReference Include="Dropbox.Api" Version="4.9.4" />
     <PackageReference Include="EntityFramework" Version="6.1.2" />
