@@ -17,39 +17,42 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        protected override Clue MakeClueImpl(FullAccount value, Guid accountId)
+        protected override Clue MakeClueImpl(FullAccount input, Guid accountId)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
-            var clue = _factory.Create(EntityType.Infrastructure.User, value.AccountId, accountId);
-
-            // TODO: Populate clue data
-            var data = clue.Data.EntityData;
-
-            if (value.Name != null)
+            if (input == null)
             {
-                if (value.Name.DisplayName != null)
-                {
-                    data.Name = value.Name.DisplayName;
-                    data.DisplayName = value.Name.DisplayName;
-                }
-
-                data.Properties[DropBoxVocabulary.AccountInfo.FamiliarName] = value.Name.FamiliarName.PrintIfAvailable();
-                data.Properties[DropBoxVocabulary.AccountInfo.GivenName] = value.Name.GivenName.PrintIfAvailable();
-                data.Properties[DropBoxVocabulary.AccountInfo.Surname] = value.Name.Surname.PrintIfAvailable();
+                throw new ArgumentNullException(nameof(input));
             }
 
-            data.Properties[DropBoxVocabulary.AccountInfo.IsPaired] = value.IsPaired.PrintIfAvailable();
+            var clue = _factory.Create(EntityType.Infrastructure.User, input.AccountId, accountId);
+
+            var data = clue.Data.EntityData;
+
+            if (input.Name != null)
+            {
+                if (input.Name.DisplayName != null)
+                {
+                    data.Name = input.Name.DisplayName;
+                    data.DisplayName = input.Name.DisplayName;
+                }
+
+                data.Properties[DropBoxVocabulary.AccountInfo.FamiliarName] = input.Name.FamiliarName.PrintIfAvailable();
+                data.Properties[DropBoxVocabulary.AccountInfo.GivenName] = input.Name.GivenName.PrintIfAvailable();
+                data.Properties[DropBoxVocabulary.AccountInfo.Surname] = input.Name.Surname.PrintIfAvailable();
+            }
+
+            data.Properties[DropBoxVocabulary.AccountInfo.IsPaired] = input.IsPaired.PrintIfAvailable();
             
-            data.Properties[DropBoxVocabulary.AccountInfo.Locale] = value.Locale.PrintIfAvailable();
-            data.Properties[DropBoxVocabulary.AccountInfo.Country] = value.Country.PrintIfAvailable();
-            data.Properties[DropBoxVocabulary.AccountInfo.Email] = value.Email.PrintIfAvailable();
-            data.Properties[DropBoxVocabulary.AccountInfo.ReferredLink] = value.ReferralLink.PrintIfAvailable();
+            data.Properties[DropBoxVocabulary.AccountInfo.Locale] = input.Locale.PrintIfAvailable();
+            data.Properties[DropBoxVocabulary.AccountInfo.Country] = input.Country.PrintIfAvailable();
+            data.Properties[DropBoxVocabulary.AccountInfo.Email] = input.Email.PrintIfAvailable();
+            data.Properties[DropBoxVocabulary.AccountInfo.ReferredLink] = input.ReferralLink.PrintIfAvailable();
 
 
-            if (! string.IsNullOrEmpty(value.Team?.Name))
-                data.Properties[DropBoxVocabulary.AccountInfo.TeamName] = value.Team.Name;
+            if (! string.IsNullOrEmpty(input.Team?.Name))
+            {
+                data.Properties[DropBoxVocabulary.AccountInfo.TeamName] = input.Team.Name;
+            }
 
             return clue;
         }

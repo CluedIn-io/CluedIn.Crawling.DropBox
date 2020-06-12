@@ -8,25 +8,20 @@ using Newtonsoft.Json.Linq;
 
 namespace CluedIn.Crawling.DropBox.Core
 {
-  public class DropBoxCrawlJobData : CrawlJobData
-  {
-    public string ApiKey { get; set; }
-    private readonly IDictionary<string, object> _configuration;
-
-        public DropBoxCrawlJobData()
-        {
-        }
-
+    public class DropBoxCrawlJobData : CrawlJobData
+    {
         public DropBoxCrawlJobData(IDictionary<string, object> configuration)
         {
             if (configuration == null)
+            {
                 return;
+            }
 
             IsAuthenticated = true;
 
-            if (configuration.ContainsKey("folders") || configuration.ContainsKey("Folders"))
+            if (configuration.ContainsKey(DropBoxConstants.KeyName.Folders) || configuration.ContainsKey(DropBoxConstants.KeyName.Folders.ToLower()))
             {
-                var start = configuration.ContainsKey("folders") ? (JArray)configuration["folders"] : (JArray)configuration["Folders"];
+                var start = configuration.ContainsKey(DropBoxConstants.KeyName.Folders) ? (JArray)configuration[DropBoxConstants.KeyName.Folders] : (JArray)configuration[DropBoxConstants.KeyName.Folders.ToLower()];
 
                 var ids = new List<string>();
                 foreach (JObject element in start)
@@ -80,7 +75,7 @@ namespace CluedIn.Crawling.DropBox.Core
 
                 Folders = new List<CrawlEntry>();
 
-                Folders.AddRange(ids.Select(s => new CrawlEntry()
+                Folders.AddRange(ids.Select(s => new CrawlEntry
                 {
                     CrawlOptions = configuration.ContainsKey("crawlOptions")
                         ? ((CrawlOptions)configuration["crawlOptions"])
@@ -92,26 +87,26 @@ namespace CluedIn.Crawling.DropBox.Core
                         : CrawlPriority.Normal
                 }));
             };
-
-            _configuration = configuration;
-
+            
             FileSizeLimit = Constants.MaxFileIndexingFileSize;
 
-            configuration.TryGetValue("Accounts", out var accounts);
+            configuration.TryGetValue(DropBoxConstants.KeyName.Accounts, out var accounts);
 
-            configuration.TryGetValue("Providers.DropBoxClientId", out var clientId);
+            configuration.TryGetValue(DropBoxConstants.KeyName.ClientId, out var clientId);
 
-            configuration.TryGetValue("Providers.DropBoxClientSecret", out var clientSecret);
+            configuration.TryGetValue(DropBoxConstants.KeyName.ClientSecret, out var clientSecret);
 
             LastCrawlFinishTime = ReadLastCrawlFinishTime(configuration);
 
-            BaseUri = GetValue<string>(configuration, "baseUri");
-
+            BaseUri = GetValue<string>(configuration, DropBoxConstants.KeyName.BaseUri);
+            AdminMemberId = GetValue<string>(configuration, DropBoxConstants.KeyName.AdminMemberId);
             if (LastestCursors == null)
+            {
                 LastestCursors = new Dictionary<string, string>();
+            }
             else
             {
-                LastestCursors = configuration.ContainsKey("lastCursor")
+                LastestCursors = configuration.ContainsKey(DropBoxConstants.KeyName.LastCursor)
                                       ? JsonUtility.Deserialize<IDictionary<string, string>>(configuration["lastCursor"].ToString())
                                       : new Dictionary<string, string>();
             }
@@ -143,7 +138,7 @@ namespace CluedIn.Crawling.DropBox.Core
                     //var refreshToken = jUser.GetValue("RefreshToken").Value<string>();
 
 
-                    user = new AgentToken() { AccessToken = accessToken, RefreshToken = null, ExpiresIn = null };
+                    user = new AgentToken { AccessToken = accessToken, RefreshToken = null, ExpiresIn = null };
                 }
 
                 Token = user;
@@ -170,5 +165,7 @@ namespace CluedIn.Crawling.DropBox.Core
         public bool IsAuthenticated { get; set; }
 
         public long? FileSizeLimit { get; set; }
+
+        public string AdminMemberId { get; set; }
     }
 }

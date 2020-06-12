@@ -34,23 +34,29 @@ namespace CluedIn.Provider.DropBox.WebHooks
             try
             {
                 if (ConfigurationManager.AppSettings.GetFlag("Feature.Webhooks.Log.Posts", false))
+                {
                     context.Log.Debug(() => command.HttpPostData);
+                }
 
                 var configurationDataStore = context.ApplicationContext.Container.Resolve<IConfigurationRepository>();
                 if (command.WebhookDefinition.ProviderDefinitionId != null)
                 {
                     var providerDefinition = context.Organization.Providers.GetProviderDefinition(context, command.WebhookDefinition.ProviderDefinitionId.Value);
                     var jobDataCheck       = context.ApplicationContext.Container.ResolveAll<IProvider>().FirstOrDefault(providerInstance => providerDefinition != null && providerInstance.Id == providerDefinition.ProviderId);
-                    var configStoreData    = configurationDataStore.GetConfigurationById(context, command.WebhookDefinition.ProviderDefinitionId.Value);  // TODO RJ the configStoreData var is never used. Should it be ?
+                    var configStoreData    = configurationDataStore.GetConfigurationById(context, command.WebhookDefinition.ProviderDefinitionId.Value); 
 
                     // If you have stopped the provider then don't process the webhooks
                     if (providerDefinition?.WebHooks != null)
+                    {
                         if (providerDefinition.WebHooks == false || providerDefinition.IsEnabled == false)
+                        {
                             return new List<Clue>();
+                        }
+                    }
 
                     if (jobDataCheck != null)
                     {
-                        var crawlJobData = new DropBoxCrawlJobData();
+                        var crawlJobData = new DropBoxCrawlJobData(configStoreData);
 
                         var clues = new List<Clue>();
 

@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <ProjectGuid>{7EA3FDD6-ACF9-4C4E-A3E8-E2FB4B2A3D8C}</ProjectGuid>
+    <RootNamespace>CluedIn.Crawling.DropBox.Test.Common</RootNamespace>
+    <AssemblyName>CluedIn.Crawling.DropBox.Test.Common</AssemblyName>
+    <TargetFramework>net452</TargetFramework>
+    <AssemblyTitle>Crawling.HubSpot.Test.Common</AssemblyTitle>
+    <Product>Crawling.HubSpot.Test.Common</Product>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\DropBox.Core\Crawling.DropBox.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+</Project>

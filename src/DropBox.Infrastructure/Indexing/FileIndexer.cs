@@ -8,7 +8,6 @@ using CluedIn.Core.Agent.Jobs;
 using CluedIn.Core.Configuration;
 using CluedIn.Core.Data;
 using CluedIn.Core.IO;
-using Dropbox.Api;
 using Dropbox.Api.Files;
 
 namespace CluedIn.Crawling.DropBox.Infrastructure.Indexing
@@ -16,11 +15,11 @@ namespace CluedIn.Crawling.DropBox.Infrastructure.Indexing
     /// <summary>The file indexer.</summary>
     public class FileIndexer : IFileIndexer
     {
-        private readonly DropboxClient _client;
+        private readonly IDropBoxClient _client;
         private readonly IAgentJobProcessorArguments _args;
         private readonly ApplicationContext _context;
 
-        public FileIndexer([NotNull] DropboxClient client, [NotNull] IAgentJobProcessorArguments args, [NotNull] ApplicationContext context)
+        public FileIndexer([NotNull] IDropBoxClient client, [NotNull] IAgentJobProcessorArguments args, [NotNull] ApplicationContext context)
         {
             _client  = client ?? throw new ArgumentNullException(nameof(client));
             _args    = args ?? throw new ArgumentNullException(nameof(args));
@@ -30,21 +29,31 @@ namespace CluedIn.Crawling.DropBox.Infrastructure.Indexing
         public async Task Index(Metadata file, Clue clue)
         {
             if (file == null)
+            {
                 throw new ArgumentNullException(nameof(file));
+            }
 
             if (clue == null)
+            {
                 throw new ArgumentNullException(nameof(clue));
+            }
 
             if (file.AsFile.Size == 0)
+            {
                 return;
+            }
 
             if (!ConfigurationManager.AppSettings.GetFlag("Crawl.InitialCrawl.FileIndexing", true))
+            {
                 return;
+            }
 
             if ((long)file.AsFile.Size > Constants.MaxFileIndexingFileSize)
+            {
                 return;
+            }
 
-            var f = await _client.Files.DownloadAsync(file.PathLower, file.AsFile.Rev);
+            var f = await _client.DownloadAsync(file.PathLower, file.AsFile.Rev);
 
             using (var tempFile = new TemporaryFile(CleanFileName(file.Name)))
             {

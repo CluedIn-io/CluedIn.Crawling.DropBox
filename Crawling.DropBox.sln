@@ -1,46 +1,69 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28407.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawling.DropBox.Core", "src\DropBox.Core\Crawling.DropBox.Core.csproj", "{46D89BED-5F80-454B-9496-3163759DBEB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crawling.DropBox.Core", "src\DropBox.Core\Crawling.DropBox.Core.csproj", "{46D89BED-5F80-454B-9496-3163759DBEB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawling.DropBox", "src\DropBox.Crawling\Crawling.DropBox.csproj", "{5F649221-EBE9-4E5C-9463-F4E40A435435}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crawling.DropBox", "src\DropBox.Crawling\Crawling.DropBox.csproj", "{5F649221-EBE9-4E5C-9463-F4E40A435435}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawling.DropBox.Infrastructure", "src\DropBox.Infrastructure\Crawling.DropBox.Infrastructure.csproj", "{DE5BE162-01C7-4D2F-98F4-144E2EEB5993}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crawling.DropBox.Infrastructure", "src\DropBox.Infrastructure\Crawling.DropBox.Infrastructure.csproj", "{DE5BE162-01C7-4D2F-98F4-144E2EEB5993}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Provider.DropBox", "src\DropBox.Provider\Provider.DropBox.csproj", "{E1744515-A08B-4972-9185-0D56131AC429}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Provider.DropBox", "src\DropBox.Provider\Provider.DropBox.csproj", "{E1744515-A08B-4972-9185-0D56131AC429}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crawling.DropBox.Test", "test\unit-test\Crawling.DropBox.Test\Crawling.DropBox.Test.csproj", "{D5313469-60EA-4B41-9D76-347F5D4101E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crawling.DropBox.Unit.Test", "test\unit\Crawling.DropBox.Unit.Test\Crawling.DropBox.Unit.Test.csproj", "{D5313469-60EA-4B41-9D76-347F5D4101E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Provider.DropBox.Test", "test\unit-test\Provider.DropBox.Test\Provider.DropBox.Test.csproj", "{24C48AD5-562B-4C9B-9FC3-52EB0C79007C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Provider.DropBox.Unit.Test", "test\unit\Provider.DropBox.Unit.Test\Provider.DropBox.Unit.Test.csproj", "{24C48AD5-562B-4C9B-9FC3-52EB0C79007C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Config", "_Config", "{153182F5-8A66-4AF5-AEE5-A35ACF793692}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-		.gitignore = .gitignore
-		Nuget.config = Nuget.config
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Docs", "_Docs", "{57E743C9-2E9B-4CA7-A9BD-E89B46B390E9}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{57E743C9-2E9B-4CA7-A9BD-E89B46B390E9}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Code", "Code", "{4D081256-19A6-4190-8224-FB9CF5793B6A}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{4D081256-19A6-4190-8224-FB9CF5793B6A}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{32830E2D-B53F-4D0F-984E-806248F7C8D8}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{6068A50D-8E76-434E-ADE8-2E4A0A66333D}"
 	ProjectSection(SolutionItems) = preProject
-		docs\Security\Crawler Threat Model.tm7 = docs\Security\Crawler Threat Model.tm7
+		test\Directory.Build.props = test\Directory.Build.props
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit", "Unit", "{D10B16B9-F33D-498D-8C6F-442B0EC7C6E2}"
+	ProjectSection(SolutionItems) = preProject
+		test\unit\Directory.Build.props = test\unit\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{CBD22F04-6415-467D-B079-44D5B01965D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Integration.DropBox", "test\integration\Tests.Integration.DropBox\Tests.Integration.DropBox.csproj", "{8F3EF0B2-A6CA-4426-919D-5E0B26F8366B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crawling.DropBox.Integration.Test", "test\integration\Crawling.DropBox.Integration.Test\Crawling.DropBox.Integration.Test.csproj", "{8F3EF0B2-A6CA-4426-919D-5E0B26F8366B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{153182F5-8A66-4AF5-AEE5-A35ACF793692}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuGet", "NuGet", "{52536837-D0BC-43EC-975F-8705CA6F0C3D}"
+	ProjectSection(SolutionItems) = preProject
+		Nuget.config = Nuget.config
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{410E280B-7826-4D72-A468-B765A2E6E920}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		GitVersion.yml = GitVersion.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{36F15FA0-AD4E-4D9F-B3E8-CC5873B203BD}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Build.targets = Directory.Build.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{ED16DE0E-4534-4C41-BEA9-BBD24B39D4EB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crawling.DropBox.Test.Common", "test\common\Crawling.DropBox.Test.Common\Crawling.DropBox.Test.Common.csproj", "{7EA3FDD6-ACF9-4C4E-A3E8-E2FB4B2A3D8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -76,6 +99,10 @@ Global
 		{8F3EF0B2-A6CA-4426-919D-5E0B26F8366B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F3EF0B2-A6CA-4426-919D-5E0B26F8366B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F3EF0B2-A6CA-4426-919D-5E0B26F8366B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EA3FDD6-ACF9-4C4E-A3E8-E2FB4B2A3D8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EA3FDD6-ACF9-4C4E-A3E8-E2FB4B2A3D8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EA3FDD6-ACF9-4C4E-A3E8-E2FB4B2A3D8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EA3FDD6-ACF9-4C4E-A3E8-E2FB4B2A3D8C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -87,10 +114,14 @@ Global
 		{E1744515-A08B-4972-9185-0D56131AC429} = {4D081256-19A6-4190-8224-FB9CF5793B6A}
 		{D5313469-60EA-4B41-9D76-347F5D4101E8} = {D10B16B9-F33D-498D-8C6F-442B0EC7C6E2}
 		{24C48AD5-562B-4C9B-9FC3-52EB0C79007C} = {D10B16B9-F33D-498D-8C6F-442B0EC7C6E2}
-		{6068A50D-8E76-434E-ADE8-2E4A0A66333D} = {57E743C9-2E9B-4CA7-A9BD-E89B46B390E9}
 		{D10B16B9-F33D-498D-8C6F-442B0EC7C6E2} = {32830E2D-B53F-4D0F-984E-806248F7C8D8}
 		{CBD22F04-6415-467D-B079-44D5B01965D1} = {32830E2D-B53F-4D0F-984E-806248F7C8D8}
 		{8F3EF0B2-A6CA-4426-919D-5E0B26F8366B} = {CBD22F04-6415-467D-B079-44D5B01965D1}
+		{52536837-D0BC-43EC-975F-8705CA6F0C3D} = {153182F5-8A66-4AF5-AEE5-A35ACF793692}
+		{410E280B-7826-4D72-A468-B765A2E6E920} = {153182F5-8A66-4AF5-AEE5-A35ACF793692}
+		{36F15FA0-AD4E-4D9F-B3E8-CC5873B203BD} = {153182F5-8A66-4AF5-AEE5-A35ACF793692}
+		{ED16DE0E-4534-4C41-BEA9-BBD24B39D4EB} = {32830E2D-B53F-4D0F-984E-806248F7C8D8}
+		{7EA3FDD6-ACF9-4C4E-A3E8-E2FB4B2A3D8C} = {ED16DE0E-4534-4C41-BEA9-BBD24B39D4EB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F65A0D1-C784-4ABE-8B71-22B8FBD404C0}

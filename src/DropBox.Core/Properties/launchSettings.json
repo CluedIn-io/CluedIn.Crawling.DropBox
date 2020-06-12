@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Crawling.DropBox.Core": {
+      "commandName": "Executable",
+      "executablePath": "D:\\Projects\\CluedIn\\CluedIn-DropBox\\.artifacts\\CluedIn\\CluedIn.Server.ConsoleHostV2.exe",
+      "workingDirectory": "D:\\Projects\\CluedIn\\CluedIn-DropBox\\.artifacts\\CluedIn"
+    }
+  }
+}

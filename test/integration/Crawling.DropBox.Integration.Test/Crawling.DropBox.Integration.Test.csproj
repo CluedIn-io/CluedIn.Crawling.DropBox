@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net452</TargetFramework>
+    <AssemblyTitle>Crawling.DropBox.Integration.Test</AssemblyTitle>
+    <Product>Crawling.DropBox.Integration.Test</Product>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CrawlerIntegrationTesting" Version="1.2.0-alpha0001" />
+    <PackageReference Include="Microsoft.Net.Http" Version="2.2.29" />
+    <PackageReference Include="Moq" Version="4.12.0" />
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\DropBox.Core\Crawling.DropBox.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\DropBox.Crawling\Crawling.DropBox.csproj" />
+    <ProjectReference Include="..\..\..\src\DropBox.Infrastructure\Crawling.DropBox.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\DropBox.Provider\Provider.DropBox.csproj" />
+    <ProjectReference Include="..\..\common\Crawling.DropBox.Test.Common\Crawling.DropBox.Test.Common.csproj" />
+  </ItemGroup>
+</Project>

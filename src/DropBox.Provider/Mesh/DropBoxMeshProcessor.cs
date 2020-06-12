@@ -1,13 +1,13 @@
-using CluedIn.Core;
-using CluedIn.Core.Messages.Processing;
 using System;
 using System.Collections.Generic;
+using CluedIn.Core;
 using CluedIn.Core.Data;
 using CluedIn.Core.Mesh;
+using CluedIn.Core.Messages.Processing;
 using CluedIn.Core.Messages.WebApp;
 using CluedIn.Crawling.DropBox.Core;
 
-namespace CluedIn.Providers.Mesh
+namespace CluedIn.Provider.DropBox.Mesh
 {
   public class DropBox_Command_MeshProcessor : BaseMeshProcessor
   {

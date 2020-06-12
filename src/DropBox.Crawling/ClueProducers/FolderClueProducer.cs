@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using System.Web;
 using CluedIn.Core;
 using CluedIn.Core.Data;
@@ -12,7 +11,7 @@ using Dropbox.Api.Files;
 
 namespace CluedIn.Crawling.DropBox.ClueProducers
 {
-    public class FolderClueProducer : BaseClueProducer<Metadata>
+    public class FolderClueProducer : BaseClueProducer<FolderMetadata>
     {
         private readonly IClueFactory _factory;
         private readonly ILogger _log;
@@ -26,13 +25,18 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             _log = log ?? throw new ArgumentNullException(nameof(log));
             _uriBuilder = uriBuilder ?? throw new ArgumentNullException(nameof(uriBuilder));
 
-            if (factory is DropBoxClueFactory dropBoxClueFactory) _providerRoot = dropBoxClueFactory.ProviderRoot; // TODO think of better way of doing referencing the base provider clue
+            if (factory is DropBoxClueFactory dropBoxClueFactory)
+            {
+                _providerRoot = dropBoxClueFactory.ProviderRoot; 
+            }
         }
 
-        protected override Clue MakeClueImpl(Metadata input, Guid accountId)
+        protected override Clue MakeClueImpl(FolderMetadata input, Guid accountId)
         {
             if (input == null)
+            {
                 throw new ArgumentNullException(nameof(input));
+            }
 
             var type = input.IsFolder ? EntityType.Files.Directory : EntityType.Files.File;
             var clue = _factory.Create(type, input.PathLower, accountId);
@@ -78,7 +82,9 @@ namespace CluedIn.Crawling.DropBox.ClueProducers
             }
 
             if (input.ParentSharedFolderId != null)
+            {
                 data.Properties[DropBoxVocabulary.File.ParentSharedFolderId] = input.ParentSharedFolderId;
+            }
 
             _factory.CreateOutgoingEntityReference(clue, EntityType.Provider.Root, EntityEdgeType.ManagedIn, _providerRoot, _providerRoot.OriginEntityCode.Value);
 

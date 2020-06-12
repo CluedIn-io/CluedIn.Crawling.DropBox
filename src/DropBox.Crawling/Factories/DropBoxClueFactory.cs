@@ -18,8 +18,12 @@ namespace CluedIn.Crawling.DropBox.Factories
         protected override Clue ConfigureProviderRoot([NotNull] Clue clue)
         {
             if (clue == null)
+            {
                 throw new ArgumentNullException(nameof(clue));
+            }
 
+            clue.ValidationRuleSuppressions.Add(Constants.Validation.Rules.PROPERTIES_001_MustExist);
+            
             var data = clue.Data.EntityData;
             data.Name = DropBoxConstants.CrawlerName;
             data.Uri = new Uri(DropBoxConstants.Uri);
@@ -30,7 +34,7 @@ namespace CluedIn.Crawling.DropBox.Factories
 
             var iconBytes = GetIcon();
 
-            var rawDataPart = new RawDataPart()
+            var rawDataPart = new RawDataPart
             {
                 Type = "/RawData/PreviewImage",
                 MimeType = MimeType.Jpeg.Code,

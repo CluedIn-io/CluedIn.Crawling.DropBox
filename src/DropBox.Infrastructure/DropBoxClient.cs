@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using CluedIn.Core.Agent.Jobs;
+using CluedIn.Crawling.DropBox.Core.Models;
 using Dropbox.Api;
 using Dropbox.Api.Files;
 using Dropbox.Api.Sharing;
@@ -21,21 +22,20 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
         private readonly IRestClient _restClient;
         private readonly DropboxClient _dropBoxClient;
         private readonly ILogger _log;
-        private readonly DropBoxCrawlJobData _crawlJobData;
-        private readonly AgentJobProcessorState<DropBoxCrawlJobData> _state;
 
-        public DropBoxClient(ILogger log, DropBoxCrawlJobData crawlJobData, IRestClient restClient, DropboxClient dropBoxClient, AgentJobProcessorState<DropBoxCrawlJobData> state) 
+        // TODO Create parameterless constructor, make privates as properties of interface so we can mock this class
+
+        public DropBoxClient(ILogger log, DropBoxCrawlJobData dropBoxCrawlJobData, IRestClient restClient) 
         {
             _log = log ?? throw new ArgumentNullException(nameof(log));
-            _crawlJobData = crawlJobData ?? throw new ArgumentNullException(nameof(crawlJobData));
             _restClient = restClient ?? throw new ArgumentNullException(nameof(restClient));
-            _dropBoxClient = dropBoxClient ?? throw new ArgumentNullException(nameof(dropBoxClient));
-            _state = state ?? throw new ArgumentNullException(nameof(state));
 
-            restClient.BaseUrl = new Uri(DropBoxConstants.Uri);
-            restClient.AddDefaultParameter("api_key", crawlJobData.ApiKey, ParameterType.QueryString);
+            _restClient.BaseUrl = new Uri(DropBoxConstants.ApiUri);
+           //_restClient.AddDefaultParameter("api_key", dropBoxCrawlJobData.ClientId, ParameterType.QueryString);
+            _restClient.AddDefaultHeader("Authorization", "Bearer " + dropBoxCrawlJobData.Token.AccessToken);
+            //_restClient.AddDefaultHeader("API-Select-Admin", dropBoxCrawlJobData.AdminMemberId); // TODO confirm we want to access as admin in DropBox Business accounts (see https://www.dropbox.com/developers/documentation/http/teams)
 
-            _dropBoxClient = new DropboxClient(crawlJobData.Token.AccessToken);
+            _dropBoxClient = new DropboxClient(dropBoxCrawlJobData.Token.AccessToken); 
         }
 
 
@@ -52,58 +52,64 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
             catch (Exception exception)
             {
                 _log.Warn(() => "Could not add DropBox provider", exception);
-                return new AccountInformation(accountId, accountDisplay) { Errors = new Dictionary<string, string>() { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
+                return new AccountInformation(accountId, accountDisplay) { Errors = new Dictionary<string, string> { { "error", "Please contact CluedIn support in the top menu to help you setup with Dropbox." } } };
             }
 
             return new AccountInformation(accountId, accountDisplay);
         }
 
+        public async Task<SpaceUsage> GetSpaceUsageAsync() =>
+            await _dropBoxClient.Users.GetSpaceUsageAsync();
+
         public async Task<FullAccount> GetCurrentAccountAsync() =>
-            await Execute(async () => await _dropBoxClient.Users.GetCurrentAccountAsync()).ConfigureAwait(false);
+            await Execute(async () => await _dropBoxClient.Users.GetCurrentAccountAsync());
 
         public async Task<ListFoldersResult> ListFoldersAsync() =>
-            await Execute(async () => await _dropBoxClient.Sharing.ListFoldersAsync()).ConfigureAwait(false);
+            await Execute(async () => await _dropBoxClient.Sharing.ListFoldersAsync());
 
         public async Task<ListFolderResult> ListFolderContinueAsync(string cursor) =>
-            await Execute(async () => await _dropBoxClient.Files.ListFolderContinueAsync(cursor)).ConfigureAwait(false);
+            await Execute(async () => await _dropBoxClient.Files.ListFolderContinueAsync(cursor));
 
-        public async Task<ListFolderResult> ListFolderAsync(string path, bool includeDeleted = false) =>
-            await Execute(async () => await _dropBoxClient.Files.ListFolderAsync(path: path, includeDeleted: includeDeleted)).ConfigureAwait(false);
+        public async Task<ListFoldersResult> ListFoldersContinueAsync(string cursor) =>
+            await Execute(async () => await _dropBoxClient.Sharing.ListFoldersContinueAsync(cursor));
+
+        public async Task<ListFolderResult> ListFolderAsync(string path, uint? limit = 10, bool includeDeleted = false) =>
+            await Execute(async () => await _dropBoxClient.Files.ListFolderAsync(path: path, includeDeleted: includeDeleted, limit: limit));
 
         public async Task<ListRevisionsResult> ListRevisionsAsync(string path, ulong limit = 100) =>
-            await Execute(async () => await _dropBoxClient.Files.ListRevisionsAsync(path, limit: limit)).ConfigureAwait(false);
+            await Execute(async () => await _dropBoxClient.Files.ListRevisionsAsync(path, limit: limit));
 
         public async Task<Metadata> GetMetadataAsync(string path, bool includeMediaInfo = false, bool includeDeleted = false) =>
-            await Execute(async () => await _dropBoxClient.Files.GetMetadataAsync(path, includeMediaInfo, includeDeleted)).ConfigureAwait(false);
+            await Execute(async () => await _dropBoxClient.Files.GetMetadataAsync(path, includeMediaInfo, includeDeleted));
 
         public async Task<ListFolderGetLatestCursorResult> ListFolderGetLatestCursorAsync(string path, bool recursive = true, bool includeMediaInfo = false) =>
-            await Execute(async () => await _dropBoxClient.Files.ListFolderGetLatestCursorAsync(string.Empty, recursive: recursive, includeMediaInfo: includeMediaInfo)).ConfigureAwait(false);
+            await Execute(async () => await _dropBoxClient.Files.ListFolderGetLatestCursorAsync(string.Empty, recursive: recursive, includeMediaInfo: includeMediaInfo));
 
-        public Task<IDownloadResponse<FileMetadata>> GetThumbnailAsync(string path, ThumbnailFormat format = null, ThumbnailSize size = null, ThumbnailMode mode = null)
-        {
-            throw new NotImplementedException();
-        }
+        public async Task<IDownloadResponse<FileMetadata>> GetThumbnailAsync(string path, ThumbnailFormat format = null, ThumbnailSize size = null, ThumbnailMode mode = null) =>
+            await _dropBoxClient.Files.GetThumbnailAsync(path, format, size, mode);
 
-        private async Task<T> GetAsync<T>(string url, IList<QueryStringParameter> parameters = null)
-        {
-            var request = new RestRequest(url, Method.GET);
+        public async Task<FolderList> GetFolderListViaRestAsync() =>
+            await PostAsync<FolderList>("sharing/list_folders", null);
 
-            AddParametersToRequest<T>(parameters, request);
+        public async Task<Permissions> GetFolderPermissions(Entry folder, int limit = 10) =>
+            await PostAsync<Permissions>("sharing/list_folder_members", new MemberPost {shared_folder_id = folder.shared_folder_id, limit = limit}, new Dictionary<string, string>
+            {
+                {"Content-Type", "application/json" }}
+            );
 
-            var response = await _restClient.ExecuteTaskAsync(request);
+        public async Task<IDownloadResponse<FileMetadata>> DownloadAsync(string path, string revision) =>
+            await _dropBoxClient.Files.DownloadAsync(path, revision);
 
-            return GetRequestResponse<T>(url, response);
-        }
-
-        private async Task<T> PostAsync<T>(string url, object body, IList<QueryStringParameter> parameters = null)
+        private async Task<T> PostAsync<T>(string url, object body, IDictionary<string, string> headers = null, IList<QueryStringParameter> parameters = null)
         {
             var request = new RestRequest(url, Method.POST);
 
-            AddParametersToRequest<T>(parameters, request);
+            AddParametersToRequest(parameters, request);
+            AddHeadersToRequest(headers, request);
 
             if (body != null)
             {
-                request.AddBody(body);
+                request.AddJsonBody(body);
             }
 
             var response = await _restClient.ExecuteTaskAsync(request);
@@ -115,37 +121,49 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
         {
             do
             {
-                if (_state.CancellationTokenSource.IsCancellationRequested)
-                    throw new OperationCanceledException();
-
                 try
                 {
-                    return await func().ConfigureAwait(false);
+                    return await func();
                 }
                 catch (AggregateException ex)
                 {
                     var flat = ex.Flatten();
 
                     if (flat.InnerExceptions.Count == 1 && flat.InnerExceptions[0] is RateLimitException rateEx)
-                        await Task.Delay(TimeSpan.FromSeconds(rateEx.RetryAfter), _state.CancellationTokenSource.Token).ConfigureAwait(false);
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(rateEx.RetryAfter)); 
+                    }
                     else
+                    {
                         throw;
+                    }
                 }
                 catch (RateLimitException ex)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(ex.RetryAfter), _state.CancellationTokenSource.Token).ConfigureAwait(false);
+                    await Task.Delay(TimeSpan.FromSeconds(ex.RetryAfter)); 
                 }
             }
             while (true);
         }
 
-        private static void AddParametersToRequest<T>(IList<QueryStringParameter> parameters, RestRequest request)
+        private static void AddParametersToRequest(IList<QueryStringParameter> parameters, RestRequest request)
         {
             if (parameters != null)
             {
                 foreach (var parameter in parameters)
                 {
                     request.AddParameter(parameter.Parameter);
+                }
+            }
+        }
+
+        private static void AddHeadersToRequest(IDictionary<string, string> headers, RestRequest request)
+        {
+            if (headers != null)
+            {
+                foreach (var header in headers)
+                {
+                    request.AddHeader(header.Key, header.Value);
                 }
             }
         }
@@ -175,7 +193,7 @@ namespace CluedIn.Crawling.DropBox.Infrastructure
             public QueryStringParameter(string name, object value)
             {
                 Parameter =
-                  new Parameter()
+                  new Parameter
                   {
                       Type = ParameterType.QueryString,
                       Name = name,

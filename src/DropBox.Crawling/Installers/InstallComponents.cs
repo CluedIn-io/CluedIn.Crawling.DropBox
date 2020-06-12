@@ -12,8 +12,15 @@ namespace CluedIn.Crawling.DropBox.Installers
     {
         public void Install([NotNull] IWindsorContainer container, [NotNull] IConfigurationStore store)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (store == null) throw new ArgumentNullException(nameof(store));
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container));
+            }
+
+            if (store == null)
+            {
+                throw new ArgumentNullException(nameof(store));
+            }
         }
     }
 }
